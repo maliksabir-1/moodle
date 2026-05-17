@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="blocks/blogpost/db" VERSION="20260422" COMMENT="XMLDB file for Moodle block blogpost"
+<XMLDB PATH="blocks/blogpost/db" VERSION="20260423" COMMENT="XMLDB file for Moodle block blogpost"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd">
   <TABLES>
@@ -9,14 +9,29 @@
         <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="blog_heading" TYPE="text" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="blog_text" TYPE="text" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="tags" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Comma-separated tags for user mentions"/>
         <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="email_sent" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Whether email notifications were sent"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
       </KEYS>
       <INDEXES>
         <INDEX NAME="userid" UNIQUE="false" FIELDS="userid"/>
+        <INDEX NAME="email_sent" UNIQUE="false" FIELDS="email_sent"/>
       </INDEXES>
     </TABLE>
+    <TABLE NAME="block_blogpost_prefs" COMMENT="User preferences for blogpost notifications">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="email_notifications" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="1" SEQUENCE="false" COMMENT="Whether user wants email notifications"/>
+        <FIELD NAME="notify_tags" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Tags user wants to be notified about"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="userid" TYPE="unique" FIELDS="userid"/>
+      </KEYS>
+    </TABLE>
   </TABLES>
-</XMLDB>    
+</XMLDB>

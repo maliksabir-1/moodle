@@ -2,7 +2,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'block_blogpost';
-$plugin->version = 2026042202;
-$plugin->requires = 2021051700; // Moodle 3.11 or later
+$plugin->version = 2026051700; // Bumped version for task and tag enhancements
+$plugin->requires = 2021051700;
 $plugin->maturity = MATURITY_ALPHA;
-$plugin->release = 'v1.0';
+$plugin->release = 'v1.2';
