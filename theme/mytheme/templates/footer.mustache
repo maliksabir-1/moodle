@@ -1,0 +1,126 @@
+<!-- Footer Section -->
+<footer style="
+    background: var(--footer-bg, #0B0B3B) !important; 
+    padding: var(--footer-padding, 80px 0 40px 0) !important; 
+    margin-bottom: 0 !important;
+">
+    <div class="container-fluid" style="max-width: 100%; padding: 0;">
+        <div class="row justify-content-center" style="margin: 0;">
+            <div class="col-lg-9" style="padding: 0 20px;">
+                <div class="row" style="margin: 0;">
+                    <!-- Column 1: Company Info -->
+                    <div class="col-lg-3 col-md-6" style="margin-bottom: 50px; padding-left: 15px; padding-right: 15px;">
+                        <a href="{{{ config.wwwroot }}}/index.php" style="text-decoration: none;">
+                            <h2 style="color: var(--footer-heading, #ffffff); font-weight: 700; font-size: 2rem; margin-bottom: 0px;">
+                                {{footer_shortname}}
+                            </h2>
+                        </a>
+                        <p style="color: var(--footer-accent, #6259F3); font-weight: 500; font-size: 0.7rem; letter-spacing: 2px; margin-bottom: 25px;">{{footer_shortname}}.COM</p>
+                        
+                        <div style="margin-bottom: 10px;">
+                            <i class="fa fa-map-marker" style="color: var(--footer-accent, #6259F3); margin-right: 8px;"></i>
+                            <span style="color: var(--footer-text, #a8a8c8); font-size: 0.9rem;">{{footer_address}}</span>
+                        </div>
+                        <p style="color: var(--footer-text, #a8a8c8); font-size: 0.9rem; margin-bottom: 10px; padding-left: 22px;">{{footer_city}}</p>
+                        
+                        {{#footer_phone}}
+                        <div style="margin-bottom: 10px;">
+                            <i class="fa fa-phone" style="color: var(--footer-accent, #6259F3); margin-right: 8px;"></i>
+                            <span style="color: var(--footer-text, #a8a8c8); font-size: 0.9rem;">{{footer_phone}}</span>
+                        </div>
+                        {{/footer_phone}}
+                        
+                        {{#footer_email}}
+                        <div>
+                            <i class="fa fa-envelope" style="color: var(--footer-accent, #6259F3); margin-right: 8px;"></i>
+                            <a href="mailto:{{footer_email}}" style="color: var(--footer-text, #a8a8c8); font-size: 0.9rem; text-decoration: none;">{{footer_email}}</a>
+                        </div>
+                        {{/footer_email}}
+                    </div>
+
+                    <!-- Column 2: Useful Links -->
+                    <div class="col-lg-2 col-md-6" style="margin-bottom: 50px; padding-left: 15px; padding-right: 15px;">
+                        <h5 style="color: var(--footer-heading, #ffffff); font-weight: 600; font-size: 1.1rem; margin-bottom: 25px; position: relative; padding-bottom: 15px;">
+                            {{footer_useful}}
+                            <span style="position: absolute; bottom: 0; left: 0; width: 25px; height: 2px; background: var(--footer-accent, #6259F3);"></span>
+                        </h5>
+                        <ul style="list-style: none; padding: 0; margin: 0;">
+                            <li style="margin-bottom: 14px;"><a href="{{{ config.wwwroot }}}/course/" style="color: var(--footer-text, #a8a8c8); text-decoration: none; font-size: 0.9rem;">All Courses</a></li>
+                            <li style="margin-bottom: 14px;"><a href="{{{ config.wwwroot }}}/my/" style="color: var(--footer-text, #a8a8c8); text-decoration: none; font-size: 0.9rem;">My Dashboard</a></li>
+                            <li style="margin-bottom: 14px;"><a href="{{{ config.wwwroot }}}/calendar/view.php" style="color: var(--footer-text, #a8a8c8); text-decoration: none; font-size: 0.9rem;">Calendar</a></li>
+                            <li style="margin-bottom: 14px;"><a href="{{{ config.wwwroot }}}/user/files.php" style="color: var(--footer-text, #a8a8c8); text-decoration: none; font-size: 0.9rem;">Private Files</a></li>
+                            <li style="margin-bottom: 14px;"><a href="{{{ config.wwwroot }}}/badges/mybadges.php" style="color: var(--footer-text, #a8a8c8); text-decoration: none; font-size: 0.9rem;">My Badges</a></li>
+                            <li style="margin-bottom: 0;"><a href="{{{ config.wwwroot }}}/blog/" style="color: var(--footer-text, #a8a8c8); text-decoration: none; font-size: 0.9rem;">Blog</a></li>
+                        </ul>
+                    </div>
+
+                    <!-- Column 3: Our Company -->
+                    <div class="col-lg-2 col-md-6" style="margin-bottom: 50px; padding-left: 15px; padding-right: 15px;">
+                        <h5 style="color: var(--footer-heading, #ffffff); font-weight: 600; font-size: 1.1rem; margin-bottom: 25px; position: relative; padding-bottom: 15px;">
+                            {{footer_company}}
+                            <span style="position: absolute; bottom: 0; left: 0; width: 25px; height: 2px; background: var(--footer-accent, #6259F3);"></span>
+                        </h5>
+                        <ul style="list-style: none; padding: 0; margin: 0;">
+                            <li style="margin-bottom: 14px;"><a href="{{{ config.wwwroot }}}/user/contactsitesupport.php" style="color: var(--footer-text, #a8a8c8); text-decoration: none; font-size: 0.9rem;">Contact Us</a></li>
+                            <li style="margin-bottom: 14px;"><a href="{{{ config.wwwroot }}}/course/" style="color: var(--footer-text, #a8a8c8); text-decoration: none; font-size: 0.9rem;">Browse Courses</a></li>
+                            <li style="margin-bottom: 14px;"><a href="{{{ config.wwwroot }}}/course/search.php" style="color: var(--footer-text, #a8a8c8); text-decoration: none; font-size: 0.9rem;">Search Courses</a></li>
+                            <li style="margin-bottom: 14px;"><a href="{{{ config.wwwroot }}}/login/signup.php" style="color: var(--footer-text, #a8a8c8); text-decoration: none; font-size: 0.9rem;">Create Account</a></li>
+                            <li style="margin-bottom: 0;"><a href="{{{ config.wwwroot }}}/admin/search.php" style="color: var(--footer-text, #a8a8c8); text-decoration: none; font-size: 0.9rem;">Site Administration</a></li>
+                        </ul>
+                    </div>
+
+                    <!-- Column 4: Newsletter -->
+                    <div class="col-lg-5 col-md-6" style="margin-bottom: 50px; padding-left: 15px; padding-right: 15px;">
+                        <h5 style="color: var(--footer-heading, #ffffff); font-weight: 600; font-size: 1.1rem; margin-bottom: 12px; position: relative; padding-bottom: 15px;">
+                            {{footer_newsletter}}
+                            <span style="position: absolute; bottom: 0; left: 0; width: 25px; height: 2px; background: var(--footer-accent, #6259F3);"></span>
+                        </h5>
+                        <p style="color: var(--footer-text, #a8a8c8); font-size: 0.85rem; margin-bottom: 20px; line-height: 1.4;">{{footer_newsletterdesc}}</p>
+                        
+                        <div style="display: flex; margin-bottom: 25px; border-radius: 4px; overflow: hidden; border: 1px solid #2a2a5a;">
+                            <input type="email" placeholder="Type your E-mail" style="flex: 1; padding: 10px 15px; border: none; outline: none; background: transparent; color: #a8a8c8; font-size: 0.85rem;">
+                            <button style="background: var(--footer-accent, #6259F3); color: #ffffff; border: none; padding: 10px 20px; font-weight: 600; font-size: 0.85rem; cursor: pointer; white-space: nowrap;">Subscribe</button>
+                        </div>
+                        
+                        <p style="color: var(--footer-heading, #ffffff); font-weight: 600; font-size: 0.9rem; margin-bottom: 15px;">Follow Us:</p>
+                        <div style="display: flex; gap: 10px;">
+                            {{#facebook_url}}<a href="{{{facebook_url}}}" target="_blank" style="display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 50%; border: 1px solid #3a3a6a; color: var(--social-icon-color, #a8a8c8); text-decoration: none; font-size: 0.85rem;"><i class="fa fa-facebook"></i></a>{{/facebook_url}}
+                            {{#instagram_url}}<a href="{{{instagram_url}}}" target="_blank" style="display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 50%; border: 1px solid #3a3a6a; color: var(--social-icon-color, #a8a8c8); text-decoration: none; font-size: 0.85rem;"><i class="fa fa-instagram"></i></a>{{/instagram_url}}
+                            {{#linkedin_url}}<a href="{{{linkedin_url}}}" target="_blank" style="display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 50%; border: 1px solid #3a3a6a; color: var(--social-icon-color, #a8a8c8); text-decoration: none; font-size: 0.85rem;"><i class="fa fa-linkedin"></i></a>{{/linkedin_url}}
+                            {{#pinterest_url}}<a href="{{{pinterest_url}}}" target="_blank" style="display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 50%; border: 1px solid #3a3a6a; color: var(--social-icon-color, #a8a8c8); text-decoration: none; font-size: 0.85rem;"><i class="fa fa-pinterest"></i></a>{{/pinterest_url}}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Bar -->
+        <div class="row" style="margin: 0;">
+            <div class="col-12" style="border-top: 1px solid #1a1a4a; padding: 22px 0 20px 0; margin-bottom: 0 !important;">
+                <div class="row justify-content-center" style="margin: 0;">
+                    <div class="col-lg-9" style="padding: 0 20px;">
+                        <div class="row align-items-center" style="margin: 0;">
+                            <div class="col-md-6 text-center text-md-start" style="padding: 1px 1px;">
+                                <p style="color: var(--footer-text, #a8a8c8); font-size: 0.85rem; margin: 0;">{{footer_copyright}}</p>
+                            </div>
+                            <div class="col-md-6 text-center text-md-end" style="padding: 10px 15px;">
+                                <a href="{{{ config.wwwroot }}}/admin/tool/policy/viewall.php" style="color: var(--footer-text, #a8a8c8); text-decoration: none; font-size: 0.85rem; margin-right: 15px;">{{footer_terms}}</a>
+                                <span style="color: #4a4a7a;">|</span>
+                                <a href="{{{ config.wwwroot }}}/admin/tool/dataprivacy/summary.php" style="color: var(--footer-text, #a8a8c8); text-decoration: none; font-size: 0.85rem; margin-left: 15px;">{{footer_privacy}}</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<style>
+    footer { padding-bottom: 4px !important; margin-bottom: 0 !important; position: relative; z-index: 10; }
+    footer a { transition: color 0.3s ease; }
+    footer a:hover { color: var(--footer-accent, #6259F3) !important; }
+    footer button:hover { background: #4a42d9 !important; }
+    footer a:active, footer a:focus { color: var(--footer-heading, #ffffff) !important; background: transparent !important; text-decoration: none !important; outline: none !important; box-shadow: none !important; }
+    @media (max-width: 991px) { footer { padding: 60px 0 120px 0 !important; } footer h2 { font-size: 1.6rem !important; } footer [class*="col-"] { margin-bottom: 55px !important; } footer .col-lg-9 { padding: 0 25px !important; } }
+</style>

@@ -1,0 +1,2611 @@
+﻿{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template theme_mytheme/frontpage
+
+    Custom homepage template for mytheme
+}}
+
+{{< theme_mytheme/drawers }}
+    {{$bodyattributes}}{{$bodyattributes}}{{/bodyattributes}}{{/bodyattributes}}
+    
+    {{! Pass user data to the drawer template }}
+    {{$user_initials}}{{user_initials}}{{/user_initials}}
+    
+    {{$content}}
+    <div class="container-fluid p-0">
+        <!-- Hero Section -->
+        <div class="hero-section" style="position: relative; width: 100%; min-height: 100vh; margin-top: -1px; background: #0a0a2a;">
+            <!-- Full Width Background Image -->
+            <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; z-index: 0;">
+                <img src="{{{heroimage}}}" 
+                    alt="Professional Learning" 
+                    class="hero-bg-image"
+                    style="width: 100%; height: 100%; display: block;">
+            </div>
+
+            <!-- Dark Overlay for Text Readability -->
+            <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: var(--hero-overlay-color, linear-gradient(135deg, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0.45) 100%)); z-index: 1;"></div>
+
+            <!-- Content -->
+            <div class="container" style="position: relative; z-index: 2; max-width: 1200px; margin: 0 auto; padding: 0 15px; height: 100%;">
+                <div class="row" style="min-height: 100vh; height: 100%; align-items: center;">
+                    <!-- Left Content - 6 Columns -->
+                    <div class="col-12 col-lg-6 text-white py-5 text-center text-lg-start"> 
+                    <p class="mb-3" style="color: var(--hero-tagline-color, {{secondarycolor}}); font-weight: 600; text-shadow: 1px 1px 2px rgba(0,0,0,0.5);">
+                            {{herotagline}}
+                    </p>
+                        
+                        <h1 class="mb-4 fw-bold" style="color: var(--hero-title-color, #ffffff); font-size: 3rem; line-height: 1.2; text-shadow: 2px 2px 4px rgba(0,0,0,0.5);">
+                            {{{herotitle}}}
+                        </h1>
+                        
+                        <p class="lead mb-4" style="color: var(--hero-desc-color, #ffffff); font-size: 1.1rem; opacity: 0.95; text-shadow: 1px 1px 2px rgba(0,0,0,0.5);">
+                        {{{herodescription}}}
+                        </p>
+                        
+                        <!-- Search Bar with Live Search -->
+<div class="mt-4 mb-4 position-relative">
+    <div class="responsive-search-form">
+        <div class="search-wrapper">
+            <div class="search-input-group">
+                <input type="text" 
+                    class="search-input-field" 
+                    id="liveSearchInput"
+                    name="search" 
+                    placeholder="Search Here..." 
+                    autocomplete="off"
+                    aria-label="Search courses">
+                <button class="search-submit-btn" type="button" id="searchSubmitBtn">
+                    <i class="fa fa-arrow-right me-2"></i>Find Courses
+                </button>
+            </div>
+            <!-- Live Search Results Dropdown -->
+            <div id="liveSearchResults" class="live-search-results"></div>
+        </div>
+    </div>
+</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <style>
+            /* Hero Background Image - Responsive */
+            .hero-bg-image {
+                object-fit: cover;
+                object-position: center center;
+            }
+            
+            /* Responsive Search Bar Styles */
+            .responsive-search-form {
+                width: 100%;
+                max-width: 500px;
+            }
+            
+            .search-wrapper {
+                width: 100%;
+            }
+            
+            .search-input-group {
+                display: flex;
+                align-items: center;
+                background: white;
+                border-radius: 50px;
+                overflow: hidden;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+                width: 100%;
+            }
+            
+            .search-input-field {
+                flex: 1;
+                border: none;
+                padding: 0 20px;
+                height: 48px;
+                font-size: 0.95rem;
+                outline: none;
+                background: white;
+                color: #333;
+                border-radius: 50px 0 0 50px;
+            }
+            
+            .search-input-field::placeholder {
+                color: #999;
+            }
+            
+            .search-submit-btn {
+                background: #0b0557;
+                color: white;
+                border: none;
+                padding: 0 25px;
+                height: 48px;
+                font-weight: 600;
+                font-size: 0.9rem;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                white-space: nowrap;
+                border-radius: 50px;
+                margin: 4px;
+            }
+            
+            .search-submit-btn:hover {
+                background: var(--primary-color, #5751E1);
+                transform: translateY(-2px);
+            }
+            
+            /* Remove problematic margins that cause scroll */
+            .hero-section {
+                margin-left: 0 !important;
+                margin-right: 0 !important;
+                left: 0 !important;
+                right: 0 !important;
+                overflow: visible !important;
+            }
+            
+            /* Ensure no horizontal scroll on body */
+            body {
+                overflow-x: hidden !important;
+                width: 100% !important;
+            }
+            
+            /* Remove all spacing above hero section */
+            #page-header,
+            .secondary-navigation,
+            .tertiary-navigation,
+            .drawer-toggles,
+            .activity-header,
+            .course-content-header,
+            #course-header {
+                display: none !important;
+            }
+
+            /* Obliterate default Moodle margins and paddings for the frontpage */
+            body,
+            #page.drawers,
+            #page,
+            #page-wrapper,
+            .drawers,
+            #page.drawers .main-inner,
+            .main-inner,
+            #page-content,
+            #region-main-box,
+            #region-main {
+                padding-top: 0 !important;
+                padding-bottom: 0 !important;
+                margin-top: 0 !important;
+                margin-bottom: 0 !important;
+                margin-left: 0 !important;
+                margin-right: 0 !important;
+                padding-left: 0 !important;
+                padding-right: 0 !important;
+            }
+
+            /* Float notifications so they don't push content down */
+            #user-notifications, .user-notifications {
+                position: absolute;
+                top: 10px;
+                left: 10px;
+                right: 10px;
+                z-index: 1050;
+            }
+
+            /* Ensure hero section clears the fixed navbar */
+            .hero-section {
+                padding-top: 80px !important;
+            }
+            
+            /* Desktop */
+            @media (min-width: 1025px) {
+                .hero-bg-image {
+                    object-fit: cover;
+                }
+            }
+            
+            /* Laptop */
+            @media (min-width: 1024px) and (max-width: 1366px) {
+                .hero-section {
+                    min-height: 85vh !important;
+                }
+                
+                .hero-section h1 {
+                    font-size: 2.5rem !important;
+                }
+                
+                .search-input-field {
+                    height: 44px;
+                    font-size: 0.9rem;
+                }
+                
+                .search-submit-btn {
+                    height: 44px;
+                    font-size: 0.85rem;
+                    padding: 0 20px;
+                }
+            }
+            
+            /* Tablet */
+            @media (min-width: 769px) and (max-width: 1024px) {
+                .hero-section {
+                    min-height: 70vh !important;
+                    padding-top: 70px !important;
+                }
+                
+                .hero-bg-image {
+                    object-fit: cover;
+                }
+                
+                .hero-section h1 {
+                    font-size: 2rem !important;
+                }
+                
+                .search-input-field {
+                    height: 42px;
+                    font-size: 0.85rem;
+                }
+                
+                .search-submit-btn {
+                    height: 42px;
+                    font-size: 0.85rem;
+                    padding: 0 18px;
+                }
+                
+                .responsive-search-form {
+                    max-width: 400px;
+                }
+            }
+            
+            /* Mobile - No Black Bars, Image Fills Completely */
+            @media (max-width: 768px) {
+                .hero-section {
+                    min-height: auto !important;
+                    height: auto !important;
+                    padding-top: 60px !important;
+                    padding-bottom: 0 !important;
+                }
+                
+                /* Keep image as absolute positioned background */
+                .hero-section > div:first-child {
+                    position: absolute !important;
+                    height: 100% !important;
+                }
+                
+                /* Use cover to fill completely - NO BLACK BARS */
+                .hero-bg-image {
+                    object-fit: cover !important;
+                    object-position: center 30% !important;
+                }
+                
+                /* Adjust overlay */
+                .hero-section > div:nth-child(2) {
+                    background: linear-gradient(135deg, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.5) 100%) !important;
+                }
+
+                /* Content height matches image */
+                .hero-section .row {
+                    min-height: auto !important;
+                    height: auto !important;
+                    justify-content: center !important;
+                    align-items: center !important;
+                    padding-top: 30px !important;
+                    padding-bottom: 50px !important;
+                }
+
+                /* Smaller text on mobile */
+                .hero-section h1 {
+                    font-size: 1.6rem !important;
+                    text-shadow: 2px 2px 8px rgba(0,0,0,0.8) !important;
+                }
+
+                .hero-section .lead {
+                    font-size: 0.9rem !important;
+                    text-shadow: 1px 1px 4px rgba(0,0,0,0.8) !important;
+                }
+                
+                .hero-section p:first-child {
+                    font-size: 0.75rem !important;
+                }
+
+                .responsive-search-form {
+                    max-width: 100%;
+                    margin: 0 auto;
+                }
+
+                .search-input-group {
+                    flex-direction: row !important;
+                    border-radius: 50px !important;
+                    background: white !important;
+                    align-items: center;
+                }
+
+                .search-input-field {
+                    flex: 1;
+                    width: auto;
+                    border-radius: 50px 0 0 50px !important;
+                    margin-bottom: 0;
+                    height: 40px;
+                    font-size: 0.8rem;
+                    padding: 0 12px;
+                    border: none;
+                    background: white;
+                }
+
+                .search-submit-btn {
+                    width: auto;
+                    border-radius: 0 50px 50px 0 !important;
+                    height: 40px;
+                    font-size: 0.75rem;
+                    padding: 0 12px;
+                    margin: 3px;
+                    white-space: nowrap;
+                }
+
+                .search-submit-btn i {
+                    display: inline-block;
+                    font-size: 0.7rem;
+                }
+            }
+            
+
+            /* Small mobile devices - Even smaller text */
+            @media (max-width: 480px) {
+                .hero-section {
+                    padding-top: 55px !important;
+                }
+                
+                .hero-bg-image {
+                    object-position: center 25% !important;
+                }
+                
+                .hero-section .row {
+                    padding-top: 20px !important;
+                    padding-bottom: 40px !important;
+                }
+
+                .hero-section h1 {
+                    font-size: 1.3rem !important;
+                    margin-bottom: 0.5rem !important;
+                }
+                
+                .hero-section .lead {
+                    font-size: 0.8rem !important;
+                    margin-bottom: 0.5rem !important;
+                }
+                
+                .hero-section p:first-child {
+                    font-size: 0.65rem !important;
+                    margin-bottom: 0.3rem !important;
+                }
+
+                .search-input-field {
+                    height: 36px;
+                    font-size: 0.7rem;
+                    padding: 0 10px;
+                }
+
+                .search-submit-btn {
+                    height: 36px;
+                    font-size: 0.65rem;
+                    padding: 0 8px;
+                }
+                
+                .search-submit-btn i {
+                    display: none;
+                }
+                
+                .mt-4 {
+                    margin-top: 0.3rem !important;
+                }
+                
+                .mb-4 {
+                    margin-bottom: 0.3rem !important;
+                }
+            }
+            
+            /* Large Desktop */
+            @media (min-width: 1367px) {
+                .hero-section {
+                    min-height: 90vh !important;
+                }
+                
+                .hero-bg-image {
+                    object-fit: cover;
+                }
+                
+                .search-input-field {
+                    height: 50px;
+                    font-size: 1rem;
+                }
+                
+                .search-submit-btn {
+                    height: 50px;
+                    font-size: 0.95rem;
+                }
+            }
+            /* Tablet */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .hero-section {
+        min-height: 90vh !important;
+        padding-top: 70px !important;
+    }
+    
+    .hero-bg-image {
+        object-fit: cover;
+    }
+    
+    .hero-section h1 {
+        font-size: 2rem !important;
+    }
+    
+    .responsive-search-form {
+        max-width: 450px !important;
+        margin: 0 auto !important;
+    }
+    
+    .search-input-field {
+        height: 38px;
+        font-size: 0.8rem;
+    }
+    
+    .search-submit-btn {
+        height: 38px;
+        font-size: 0.75rem;
+        padding: 0 14px;
+    }
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+    .hero-section {
+        min-height: auto !important;
+        height: auto !important;
+        padding-top: 60px !important;
+        padding-bottom: 0 !important;
+    }
+    
+    .hero-section > div:first-child {
+        position: absolute !important;
+        height: 100% !important;
+        min-height: 250px !important;
+    }
+    
+    .hero-bg-image {
+        object-fit: cover !important;
+        object-position: center 30% !important;
+        height: 100% !important;
+    }
+    
+    .hero-section > div:nth-child(2) {
+        background: linear-gradient(135deg, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.5) 100%) !important;
+    }
+
+    .hero-section .row {
+        min-height: 250px !important;
+        height: auto !important;
+        justify-content: center !important;
+        align-items: center !important;
+        padding-top: 30px !important;
+        padding-bottom: 50px !important;
+    }
+
+    .hero-section h1 {
+        font-size: 1.6rem !important;
+        text-shadow: 2px 2px 8px rgba(0,0,0,0.8) !important;
+    }
+
+    .hero-section .lead {
+        font-size: 0.9rem !important;
+        text-shadow: 1px 1px 4px rgba(0,0,0,0.8) !important;
+    }
+    
+    .hero-section p:first-child {
+        font-size: 0.75rem !important;
+    }
+
+    .responsive-search-form {
+        max-width: 260px !important;
+        margin: 0 auto !important;
+    }
+
+    .search-input-field {
+        height: 34px !important;
+        font-size: 0.7rem !important;
+        padding: 0 8px !important;
+    }
+
+    .search-submit-btn {
+        height: 34px !important;
+        font-size: 0.6rem !important;
+        padding: 0 8px !important;
+        margin: 2px !important;
+    }
+
+    .search-submit-btn i {
+        display: none !important;
+    }
+}
+
+/* Small mobile */
+@media (max-width: 480px) {
+    .hero-section {
+        padding-top: 150px !important;
+    }
+    
+    .hero-section > div:first-child {
+        min-height: 200px !important;
+    }
+    
+    .hero-section .row {
+        min-height: 100px !important;
+        padding-top: 20px !important;
+        padding-bottom: 40px !important;
+    }
+
+    .hero-section h1 {
+        font-size: 1.3rem !important;
+        margin-bottom: 0.5rem !important;
+    }
+    
+    .hero-section .lead {
+        font-size: 0.8rem !important;
+        margin-bottom: 0.5rem !important;
+    }
+    
+    .hero-section p:first-child {
+        font-size: 0.65rem !important;
+        margin-bottom: 0.3rem !important;
+    }
+
+    .responsive-search-form {
+        max-width: 220px !important;
+    }
+
+    .search-input-field {
+        height: 30px !important;
+        font-size: 0.6rem !important;
+        padding: 0 6px !important;
+    }
+
+    .search-submit-btn {
+        height: 30px !important;
+        font-size: 0.55rem !important;
+        padding: 0 6px !important;
+        margin: 2px !important;
+    }
+    
+    .mt-4 {
+        margin-top: 0.3rem !important;
+    }
+    
+    .mb-4 {
+        margin-bottom: 0.3rem !important;
+    }
+}
+        </style>
+       <!-- Stats Section with Bootstrap Grid -->
+<div class="dynamic-stats-section" style="padding-top: 0 !important; padding-bottom: 0 !important; background: transparent;">
+    <div class="container" style="padding-top: 0 !important; padding-bottom: 0 !important;">
+        <div class="row justify-content-center">
+            <div class="col-lg-11">
+                <div class="stat-box p-4 rounded-4 shadow-sm" style="background: var(--stats-bg, #E3E3EF);">
+                    <div class="row g-3">
+                        <!-- Learn Skills -->
+                        <div class="col-12 col-md-6 col-lg-3">
+                            <div class="stat-item d-flex align-items-center justify-content-center justify-content-md-start px-3 py-2">
+                                <div class="stat-icon flex-shrink-0 rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 45px; height: 45px; background: rgba(26, 86, 219, 0.1);">
+                                    <i class="fa fa-users fa-lg" style="color: var(--stat1-color, #1a56db);"></i>
+                                </div>
+                                <div>
+                                    <span class="fw-bold small d-block" style="color: var(--stat1-label-color, var(--stat-label-color, #000));">{{stat1label}} {{total_users}}+</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Choose Courses -->
+                        <div class="col-12 col-md-6 col-lg-3">
+                            <div class="stat-item d-flex align-items-center justify-content-center justify-content-md-start px-3 py-2">
+                                <div class="stat-icon flex-shrink-0 rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 45px; height: 45px; background: rgba(25, 135, 84, 0.1);">
+                                    <i class="fa fa-book fa-lg" style="color: var(--stat2-color, #198754);"></i>
+                                </div>
+                                <div>
+                                    <span class="fw-bold small d-block" style="color: var(--stat2-label-color, var(--stat-label-color, #000));">{{stat2label}} {{total_courses}}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Professional Tutors -->
+                        <div class="col-12 col-md-6 col-lg-3">
+                            <div class="stat-item d-flex align-items-center justify-content-center justify-content-md-start px-3 py-2">
+                                <div class="stat-icon flex-shrink-0 rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 45px; height: 45px; background: rgba(255, 193, 7, 0.1);">
+                                    <i class="fa fa-chalkboard-user fa-lg" style="color: var(--stat3-color, #ffc107);"></i>
+                                </div>
+                                <div>
+                                    <span class="fw-bold small d-block" style="color: var(--stat3-label-color, var(--stat-label-color, #000));">{{stat3label}} {{total_tutors}}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Online Degrees -->
+                        <div class="col-12 col-md-6 col-lg-3">
+                            <div class="stat-item d-flex align-items-center justify-content-center justify-content-md-start px-3 py-2">
+                                <div class="stat-icon flex-shrink-0 rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 45px; height: 45px; background: rgba(13, 202, 240, 0.1);">
+                                    <i class="fa fa-graduation-cap fa-lg" style="color: var(--stat4-color, #0dcaf0);"></i>
+                                </div>
+                                <div>
+                                    <span class="fw-bold small d-block" style="color: var(--stat4-label-color, var(--stat-label-color, #000));">{{stat4label}} {{total_degrees}}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+     <!-- Popular Courses Section -->
+<div class="courses-section py-5" style="background: var(--courses-bg, #F9F9F9)">
+    <div class="container py-4">
+        <div class="text-center mb-5">
+           <p class="lead mb-0" style="color: var(--primary-color, #5751E1); font-family: Inter; font-weight: 500; font-size: 14px; line-height: 1; text-align: center; display: inline-block; padding: 5px 12px; border-radius: 50px; background: rgba(87, 81, 225, 0.1);">
+                {{total_courses}} {{coursessubtitle}}
+           </p>
+            <h4 class="display-9 fw-bold text-dark mb-3" style="color: var(--courses-title-color, #000) !important;">{{coursestitle}}</h4>
+        </div>
+        <div class="row g-4 {{#courses_is_slider}}flex-nowrap overflow-auto hide-scrollbar pb-3{{/courses_is_slider}}">
+            {{#popularcourses}}
+            <div class="{{colclassmobile}} {{colclasstablet}} {{colclass}} mb-4">
+                <div class="course-card bg-white rounded-3 shadow-sm overflow-hidden h-100">
+                    <!-- Course Image -->
+                    <a href="{{{ config.wwwroot }}}/course/view.php?id={{id}}" class="text-decoration-none">
+                        <div class="course-image position-relative" style="height: 180px; overflow: hidden; border-radius: 6px 6px 0 0;">
+                            {{#image}}
+                            <img src="{{{ image }}}" class="w-100 h-100" alt="" style="object-fit: cover;" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                            <div class="bg-secondary w-100 h-100 align-items-center justify-content-center" style="display: none;">
+                                <i class="fa fa-book" style="font-size: 40px; color: white;"></i>
+                            </div>
+                            {{/image}}
+                            {{^image}}
+                            <div class="bg-secondary w-100 h-100 d-flex align-items-center justify-content-center">
+                                <i class="fa fa-book" style="font-size: 40px; color: white;"></i>
+                            </div>
+                            {{/image}}
+                            <!-- Category Badge Top Left (on image) -->
+                            {{#categoryname}}
+                            <span class="category-badge position-absolute top-0 start-0 m-2 px-2 py-1 bg-primary text-white rounded-2 small fw-bold">
+                                {{categoryname}}
+                            </span>
+                            {{/categoryname}}
+                        </div>
+                    </a>
+                    <div class="p-3">
+    <!-- Price and Heart Row -->
+    {{#showprice}}
+    <div class="d-flex justify-content-between align-items-center mb-2">
+        <span class="price-text fw-bold" style="color: var(--primary-color, #5751E1); font-size: 1rem;">
+            ${{price}}
+        </span>
+        <span class="heart-icon" style="cursor: pointer;">
+            <i class="fa fa-heart-o" style="color: #999; font-size: 18px; transition: all 0.3s ease;"></i>
+        </span>
+    </div>
+    {{/showprice}}
+    {{^showprice}}
+    <div class="d-flex justify-content-end align-items-center mb-2">
+        <span class="heart-icon" style="cursor: pointer;">
+            <i class="fa fa-heart-o" style="color: #999; font-size: 18px; transition: all 0.3s ease;"></i>
+        </span>
+    </div>
+    {{/showprice}}
+    
+    <!-- Course Title - DYNAMIC from database -->
+    <h6 class="fw-bold mb-1" style="font-size: 0.85rem;">
+        <a href="{{{ config.wwwroot }}}/course/view.php?id={{id}}" class="text-dark text-decoration-none course-title">
+            {{fullname}}
+        </a>
+    </h6>
+    <!-- Rating -->
+    {{#showrating}}
+    <div class="course-rating mb-2 d-flex align-items-center">
+        {{#stars_list}}
+        <i class="fa fa-star" style="color: {{#active}}var(--secondary-color, #ffc107){{/active}}{{^active}}#ddd{{/active}}; font-size: 10px;"></i>
+        {{/stars_list}}
+        <span class="text-muted ms-1" style="font-size: 10px;">{{rating_stars}}.0 {{courseratingtext}}</span>
+    </div>
+    {{/showrating}}
+    
+    <!-- Footer with lessons and students - DYNAMIC -->
+    <div class="course-footer d-flex justify-content-between align-items-center pt-2 border-top">
+        <div class="d-flex align-items-center">
+            <i class="fa fa-book-open text-primary me-1" style="font-size: 11px;"></i>
+            <span class="text-muted small" style="font-size: 10px;">{{courselessonstext}} {{totallessons}}</span>
+        </div>
+        <div class="d-flex align-items-center">
+            <i class="fa fa-users text-primary me-1" style="font-size: 11px;"></i>
+            <span class="text-muted small" style="font-size: 10px;">{{coursestudentstext}} {{totalstudents}}</span>
+        </div>
+    </div>
+</div>
+                </div>
+            </div>
+            {{/popularcourses}}
+            {{^popularcourses}}
+            <div class="col-12 text-center">
+                <p class="text-muted">No courses available yet. Check back soon!</p>
+            </div>
+            {{/popularcourses}}
+        </div>
+        <div class="text-center mt-5">
+           <a href="{{{ config.wwwroot }}}/course/" class="btn btn-md px-3" style="background: var(--primary-color, #5751E1); color: white; border-radius: 6px; border: none; text-decoration: none; display: inline-block;">
+                {{coursesbutton}} <i class="fa fa-arrow-right ms-2"></i>
+           </a>
+        </div>
+    </div>
+</div>
+
+<style>
+    .course-card {
+        border-radius: 8px !important;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .course-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.15) !important;
+    }
+    
+    .course-card .course-title:hover {
+        color: #1a56db !important;
+        text-decoration: underline !important;
+    }
+    
+    .course-card .category-badge {
+        font-size: 0.7rem;
+        backdrop-filter: blur(4px);
+        background: rgba(26, 86, 219, 0.9) !important;
+        z-index: 1;
+        pointer-events: none;
+        border-radius: 4px !important;
+    }
+    
+    .price-text {
+        font-weight: 700;
+    }
+    
+    .heart-icon {
+        transition: transform 0.2s ease;
+    }
+    
+    .heart-icon:hover {
+        transform: scale(1.1);
+    }
+    
+    .heart-icon:hover i {
+        color: #ff4757 !important;
+    }
+    
+    .course-rating {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+    
+    .course-rating i {
+        margin-right: 2px;
+    }
+    
+    .course-footer {
+        border-top-color: #e3e6f0 !important;
+    }
+    
+    .course-image {
+        cursor: pointer;
+        transition: transform 0.3s ease;
+        border-radius: 8px 8px 0 0 !important;
+    }
+    
+    .course-image:hover {
+        transform: scale(1.02);
+    }
+    
+    /* Heart active/clicked state */
+    .heart-icon i.fa-heart {
+        color: #ff4757 !important;
+        animation: heartBeat 0.3s ease;
+    }
+    
+    @keyframes heartBeat {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.2); }
+        100% { transform: scale(1); }
+    }
+    
+    @media (max-width: 768px) {
+        .course-card .course-image {
+            height: 140px !important;
+        }
+        .course-card .p-3 {
+            padding: 0.75rem !important;
+        }
+        .price-text {
+            font-size: 0.9rem !important;
+        }
+        .heart-icon i {
+            font-size: 16px !important;
+        }
+        .course-card h6 {
+            font-size: 0.8rem !important;
+        }
+        .course-subtitle {
+            font-size: 0.65rem !important;
+        }
+        .course-rating span {
+            font-size: 9px !important;
+        }
+        .course-footer span {
+            font-size: 9px !important;
+        }
+    }
+    
+    @media (min-width: 992px) and (max-width: 1199px) {
+        .course-card .course-image {
+            height: 160px !important;
+        }
+    }
+</style>
+
+<script>
+// Heart icon click functionality
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.heart-icon').forEach(function(heart) {
+        heart.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            var icon = this.querySelector('i');
+            if (icon.classList.contains('fa-heart-o')) {
+                icon.classList.remove('fa-heart-o');
+                icon.classList.add('fa-heart');
+                icon.style.color = '#ff4757';
+                // Add to wishlist logic here
+            } else {
+                icon.classList.remove('fa-heart');
+                icon.classList.add('fa-heart-o');
+                icon.style.color = '#999';
+                // Remove from wishlist logic here
+            }
+        });
+    });
+});
+</script>
+        
+        <!-- MAIN CONTENT PLACEHOLDER - REQUIRED BY MOODLE (Hidden) -->
+        <div style="display: none;">
+            {{{ maincontent }}}
+        </div>
+
+     <div class="hero-section-two position-relative overflow-hidden" style="margin-top: -1px; width: 100%; max-width: 1920px; margin-left: auto; margin-right: auto; background: transparent;">
+    <!-- Upper 50% background overlay linked to Popular Courses background -->
+    <div class="position-absolute top-0 start-0 w-100" style="height: 50%; background: {{coursesbg}}; z-index: 0;"></div>
+    <!-- Bottom 50% background overlay linked to Why Choose Us background -->
+    <div class="position-absolute bottom-0 start-0 w-100" style="height: 50%; background: {{aboutbg}}; z-index: 0;"></div>
+    
+    <!-- Content -->
+    <div style="position: relative; z-index: 1; padding: 30px 0 60px 0;">
+        <div class="container h-100 position-relative d-flex justify-content-center" style="z-index: 1;">
+            <div class="middle-content-box p-3 p-md-4 d-flex align-items-center" style="width: 66.666%; max-width: 880px; height: 130px; border-radius: 15px; opacity: 1; background: {{ctabg}}; box-shadow: 0 10px 30px rgba(0,0,0,0.15);">
+                <div class="row align-items-center w-100">
+                    <!-- Left: Student Image -->
+                    <div class="col-auto">
+                        <div class="hero-image">
+                            <img src="{{#ctaimage}}{{{ctaimage}}}{{/ctaimage}}{{^ctaimage}}{{{ config.wwwroot }}}/theme/mytheme/pix/students_edited.png{{/ctaimage}}" 
+                                 alt="Students" 
+                                 style="width: 100px; height: 110px; object-fit: cover; border-radius: 10px; display: block;">
+                        </div>
+                    </div>
+                    
+                    <!-- Middle: Text Content -->
+                    <div class="col px-3 px-md-4">
+                        <h4 class="fw-bold mb-1" style="color: white; font-size: 1.1rem; letter-spacing: 0.3px; margin: 0; line-height: 1.3;">
+                            Finding Your Right Courses
+                        </h4>
+                        <p class="mb-0" style="color: rgba(255,255,255,0.85); font-size: 0.8rem; line-height: 1.4;">
+                            Intuitive Shared Inbox Makes It Easy For Team Member
+                        </p>
+                    </div>
+                    
+                    <!-- Right: Button -->
+                    <div class="col-auto">
+                        <a href="{{{ config.wwwroot }}}/login/index.php" class="btn-get-started-hero">
+                            GET STARTED <i class="fa fa-arrow-right ms-1"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .hero-section-two {
+        position: relative;
+        min-height: auto;
+        margin-top: 0 !important;
+        background: transparent !important;
+    }
+    
+    /* Remove all spacing above hero section */
+    #page-header,
+    .secondary-navigation,
+    .tertiary-navigation,
+    .drawer-toggles,
+    .activity-header,
+    .course-content-header,
+    #course-header {
+        display: none !important;
+    }
+
+    /* Obliterate default Moodle margins and paddings for the frontpage */
+    body,
+    #page.drawers,
+    #page,
+    #page-wrapper,
+    .drawers,
+    #page.drawers .main-inner,
+    .main-inner,
+    #page-content,
+    #region-main-box,
+    #region-main {
+        padding-top: 0 !important;
+        margin-top: 0 !important;
+    }
+    
+    .middle-content-box {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        background: {{ctabg}} !important;
+    }
+    
+    .middle-content-box:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 15px 35px rgba(11, 11, 59, 0.3) !important;
+    }
+    
+    /* Get Started Button - var(--secondary-color) */
+    .btn-get-started-hero {
+        display: inline-block;
+        background: var(--secondary-color, #FFC224);
+        border: none;
+        padding: 0.45rem 1.2rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+        font-size: 0.7rem;
+        transition: all 0.3s ease;
+        border-radius: 6px;
+        color: var(--primary-color, #0B0B3B) !important;
+        text-decoration: none;
+        white-space: nowrap;
+    }
+    
+    .btn-get-started-hero:hover {
+        background: #FFD54F;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        color: #000 !important;
+        text-decoration: none;
+    }
+    
+    .btn-get-started-hero i {
+        transition: transform 0.3s ease;
+        font-size: 0.7rem;
+    }
+    
+    .btn-get-started-hero:hover i {
+        transform: translateX(3px);
+    }
+
+    /* Make image crisp and clear */
+    .hero-image img {
+        image-rendering: -webkit-optimize-contrast;
+        image-rendering: crisp-edges;
+    }
+
+    @media (max-width: 1024px) {
+        .middle-content-box {
+            width: 90% !important;
+            max-width: 90% !important;
+            height: auto !important;
+            min-height: 110px;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .hero-section-two > div:first-child {
+            padding: 20px 0 40px 0 !important;
+        }
+        
+        .middle-content-box {
+            width: 95% !important;
+            max-width: 95% !important;
+            height: auto !important;
+        }
+        
+        .middle-content-box .row {
+            flex-direction: column;
+            text-align: center;
+        }
+        
+        .middle-content-box .col-auto {
+            width: 100%;
+            text-align: center;
+        }
+        
+        .hero-image {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 12px;
+        }
+        
+        .hero-image img {
+            width: 90px !important;
+            height: 100px !important;
+        }
+        
+        .middle-content-box .col {
+            padding: 0 !important;
+            margin-bottom: 12px;
+        }
+        
+        .btn-get-started-hero {
+            padding: 0.4rem 1rem;
+            font-size: 0.65rem;
+        }
+        
+        h4 {
+            font-size: 0.95rem !important;
+        }
+        
+        p {
+            font-size: 0.75rem !important;
+        }
+        
+        .middle-content-box {
+            padding: 1.25rem !important;
+        }
+    }
+    
+    @media (min-width: 769px) and (max-width: 991px) {
+        .btn-get-started-hero {
+            padding: 0.4rem 1rem;
+            font-size: 0.65rem;
+        }
+        
+        h4 {
+            font-size: 0.95rem !important;
+        }
+        
+        p {
+            font-size: 0.75rem !important;
+        }
+        
+        .hero-image img {
+            width: 100px !important;
+            height: 110px !important;
+        }
+    }
+</style>
+        <!-- Why Choose Us Section - 8 Middle Columns with Bootstrap -->
+        <section class="why-choose-us py-5" style="background: {{aboutbg}};">
+            <div class="container">
+                <div class="row justify-content-center">
+                    <!-- Middle 8 Columns -->
+                    <div class="col-lg-8">
+                        <div class="row g-4">
+                            <!-- Left Side: Image - 4 columns -->
+                            <div class="col-md-6">
+                                <div class="position-relative">
+                                    <img src="{{#aboutimage}}{{{aboutimage}}}{{/aboutimage}}{{^aboutimage}}{{{ config.wwwroot }}}/theme/mytheme/pix/about-us.png{{/aboutimage}}" 
+                                        alt="Why Choose Us" 
+                                        class="img-fluid rounded-4 w-100 "
+                                        style="object-fit: cover; height: 100%; min-height: 350px;"
+                                        onerror="this.src='https://placehold.co/600x500/f0f2f5/1a56db?text=Image'">
+                                </div>
+                            </div>
+                            
+                            <!-- Right Side: Text Content - 4 columns -->
+                            <div class="col-md-6">
+                                <h3 class="why-choose-us-badge">
+                                    Why Choose Us
+                                </h3>
+                                <h2 class="fw-bold text-dark mb-3" style="font-size: 1.8rem; line-height: 1.3;">
+                                    Professional Courses Taught<br>By Industry Leaders
+                                </h2>
+                                <p class="text-muted mb-3" style="font-size: 0.95rem; line-height: 1.5;">
+                                    Groove's intuitive shared inbox makes it easy for team member<br>
+                                    an in this episode. Groove's intuitive shared inboxes for team<br>
+                                    organize, prioritize an in this episode.
+                                </p>
+                                <ul class="list-unstyled mb-4" style="text-align: left; margin: 0; padding: 0;">
+                                    <li class="mb-2" style="margin: 0; padding: 0; list-style: none; display: flex; align-items: center;">
+                                        <span style="display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; background: var(--secondary-color, #FFC224); border-radius: 50%; margin-right: 10px; font-weight: 900; font-size: 0.75rem; color: #000000; flex-shrink: 0;">&gt;</span>
+                                        <span style="color: #333; font-size: 1rem; font-weight: 600;">Body & Mind Stress Relief</span>
+                                    </li>
+                                    <li class="mb-2" style="margin: 0; padding: 0; list-style: none; display: flex; align-items: center;">
+                                        <span style="display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; background: var(--secondary-color, #FFC224); border-radius: 50%; margin-right: 10px; font-weight: 900; font-size: 0.75rem; color: #000000; flex-shrink: 0;">&gt;</span>
+                                        <span style="color: #333; font-size: 1rem; font-weight: 600;">Enhance Strength Growing</span>
+                                    </li>
+                                    <li class="mb-2" style="margin: 0; padding: 0; list-style: none; display: flex; align-items: center;">
+                                        <span style="display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; background: var(--secondary-color, #FFC224); border-radius: 50%; margin-right: 10px; font-weight: 900; font-size: 0.75rem; color: #000000; flex-shrink: 0;">&gt;</span>
+                                        <span style="color: #333; font-size: 1rem; font-weight: 600;">Get Better Posture</span>
+                                    </li>
+                                </ul>
+                                <a href="{{{ config.wwwroot }}}/login/index.php" class="btn btn-primary px-4 py-2" style="background: var(--primary-color, #5751E1); border: none; font-size: 0.9rem; font-weight: 500; border-radius: 8px;">
+                                    Start Free Trial <i class="fa fa-arrow-right ms-2"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <style>
+            .why-choose-us {
+                background: white;
+            }
+            
+            /* Round button style for Why Choose Us heading */
+            .why-choose-us-badge {
+                display: inline-block;
+                background: #f0f2f5;
+                color: #1a56db;
+                padding: 6px 20px;
+                border-radius: 50px;
+                font-size: 0.85rem;
+                font-weight: 600;
+                letter-spacing: 1px;
+                text-transform: uppercase;
+                margin-bottom: 20px;
+            }
+            
+            .why-choose-us .btn-primary {
+                transition: all 0.3s ease;
+            }
+            
+            .why-choose-us .btn-primary:hover {
+                background: #0b0557 !important;
+                transform: translateY(-2px);
+                box-shadow: 0 4px 12px rgba(26, 86, 219, 0.3);
+            }
+            
+            .why-choose-us img {
+                transition: transform 0.3s ease;
+            }
+            
+            .why-choose-us img:hover {
+                transform: scale(1.02);
+            }
+            
+            /* Remove all margins and padding from list items */
+            .why-choose-us ul,
+            .why-choose-us li {
+                margin: 0;
+                padding: 0;
+            }
+            
+            @media (max-width: 768px) {
+                .why-choose-us .col-md-6 {
+                    text-align: left;
+                }
+                
+                .why-choose-us h2 {
+                    font-size: 1.5rem !important;
+                }
+                
+                .why-choose-us p br {
+                    display: none;
+                }
+                
+                .why-choose-us-badge {
+                    font-size: 0.75rem;
+                    padding: 4px 16px;
+                }
+            }
+        </style>
+        <style>
+            .bg-gradient-primary {
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            }
+            
+            .feature-icon {
+                width: 70px;
+                height: 70px;
+                line-height: 70px;
+                text-align: center;
+                margin-bottom: 1rem;
+            }
+            
+            .feature-icon i {
+                line-height: 70px;
+            }
+            
+            .feature-card, .course-card {
+                transition: transform 0.3s ease, box-shadow 0.3s ease;
+            }
+            
+            .feature-card:hover, .course-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 10px 30px rgba(0,0,0,0.15) !important;
+            }
+            
+            .stat-number {
+                font-weight: 700;
+                margin-bottom: 0.5rem;
+            }
+            
+            .course-image {
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            }
+            
+            @media (max-width: 768px) {
+                .hero-section {
+                    min-height: 60vh !important;
+                    padding-top: 2rem;
+                    padding-bottom: 2rem;
+                }
+                .hero-title {
+                    font-size: 2.2rem !important;
+                    line-height: 1.2;
+                }
+                .display-7 {
+                    font-size: 1.1rem !important;
+                }
+                .display-4 {
+                    font-size: 2rem;
+                }
+                .display-5 {
+                    font-size: 1.75rem;
+                }
+                .input-group-lg .search-input {
+                    height: 50px !important;
+                    font-size: 1rem;
+                }
+                .input-group-lg .btn {
+                    padding-left: 1rem !important;
+                    padding-right: 1rem !important;
+                    font-size: 0.9rem;
+                }
+                .input-group-lg .btn i {
+                    display: none; /* Hide icon on mobile to save space */
+                }
+            }
+            
+            /* Animations */
+            .animate__animated {
+                animation-duration: 1s;
+                animation-fill-mode: both;
+            }
+            
+            @keyframes fadeInUp {
+                from {
+                    opacity: 0;
+                    transform: translate3d(0, 40px, 0);
+                }
+                to {
+                    opacity: 1;
+                    transform: translate3d(0, 0, 0);
+                }
+            }
+            
+            .animate__fadeInUp {
+                animation-name: fadeInUp;
+            }
+        </style>
+        <!-- Our Top Categories Section - Full Screen Background -->
+        <section class="top-categories-section position-relative" style="min-height: 600px; {{#categoriesbg}}background-image: url('{{{categoriesbg}}}');{{/categoriesbg}} background-size: cover; background-position: center; background-attachment: fixed; background-color: {{categoriesbg_color}} !important;">
+            <!-- Background Overlay to show the color even with an image -->
+            <div class="position-absolute top-0 start-0 w-100 h-100" style="background-color: {{categoriesbg_color}}; opacity: 0.7; z-index: 0;"></div>
+            
+            <!-- Content -->
+            <div class="container position-relative" style="z-index: 1; padding: 80px 0;">
+                <div class="row justify-content-center">
+                    <!-- Middle 10 Columns -->
+                    <div class="col-lg-10">
+                        <!-- Header Text -->
+                        <div class="text-center mb-5">
+                            <h3 class="top-categories-badge">
+                                {{categoriesbadge}}
+                            </h3>
+                           <h2 class="fw-bold mb-3" style="font-size: 1.8rem; line-height: 1.3; color: #000000;">
+                                {{{categoriestitle}}}
+                          </h2>
+                        </div>
+                        
+                        <!-- Categories Cards Row -->
+                        <div class="row g-4 justify-content-center {{#cats_is_slider}}flex-nowrap overflow-auto hide-scrollbar pb-3{{/cats_is_slider}}">
+                            {{#categories}}
+                            <div class="{{catcolclassmobile}} {{catcolclasstablet}} {{catcolclass}} mb-4">
+                                <a href="{{{ config.wwwroot }}}/course/index.php?categoryid={{id}}" class="text-decoration-none">
+                                    <div class="category-card text-center p-4 rounded-4 shadow-sm h-100" style="background: {{categoriescardbg}} !important;">
+                                        <div class="category-icon mb-3">
+                                            {{#icon}}
+                                            <i class="fa {{icon}} fa-3x" style="color: {{categoriesiconcolor}} !important;"></i>
+                                            {{/icon}}
+                                            {{^icon}}
+                                            <i class="fa fa-folder-open fa-3x" style="color: {{categoriesiconcolor}} !important;"></i>
+                                            {{/icon}}
+                                        </div>
+                                        <h4 class="fw-bold mb-2" style="color: #000000;">{{name}}</h4>
+                                        <p class="mb-0" style="color: #555555;">{{coursecount}} Courses</p>
+                                    </div>
+                                </a>
+                            </div>
+                            {{/categories}}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <style>
+            .top-categories-section {
+                margin-left: calc(-50vw + 50%);
+                margin-right: calc(-50vw + 50%);
+            }
+            
+            /* Round button style for Our Top Categories heading */
+            .top-categories-badge {
+                display: inline-block;
+                background: {{categoriesbadgebg}} !important;
+                color: {{categoriesbadgecolor}} !important;
+                padding: 8px 25px;
+                border-radius: 50px;
+                font-size: 0.9rem;
+                font-weight: 600;
+                letter-spacing: 1px;
+                text-transform: uppercase;
+                margin-bottom: 20px;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            }
+            
+            .category-card {
+                transition: transform 0.3s ease, box-shadow 0.3s ease;
+                cursor: pointer;
+                background: white !important;
+            }
+            
+            .category-card:hover {
+                transform: translateY(-8px);
+                box-shadow: 0 15px 35px rgba(0,0,0,0.2) !important;
+            }
+            
+            .category-icon i {
+                transition: transform 0.3s ease;
+            }
+            
+            .category-card:hover .category-icon i {
+                transform: scale(1.1);
+            }
+            
+            /* Remove underline from link */
+            .top-categories-section a {
+                text-decoration: none;
+            }
+            
+            @media (max-width: 768px) {
+                .top-categories-section {
+                    min-height: auto !important;
+                }
+                
+                .top-categories-section h2 {
+                    font-size: 1.8rem !important;
+                }
+                
+                .top-categories-badge {
+                    font-size: 0.75rem;
+                    padding: 5px 18px;
+                }
+                
+                .category-card {
+                    padding: 1.5rem !important;
+                }
+                
+                .category-icon i {
+                    font-size: 2rem !important;
+                }
+                
+                .category-card h4 {
+                    font-size: 1.1rem !important;
+                }
+                
+                .category-card p {
+                    font-size: 0.85rem !important;
+                }
+             }
+            
+             @media (min-width: 769px) and (max-width: 991px) {
+                .category-card {
+                    padding: 1.5rem !important;
+                }
+                
+                .category-icon i {
+                    font-size: 2rem !important;
+                }
+            }
+        </style>
+           <!-- Skilled Introduce Section - Expert Instructors -->
+            <section class="skilled-introduce-section py-5" style="background-color: {{instructorsbg}} !important;">
+                <div class="container">
+                    <div class="row justify-content-center">
+                        <!-- Middle 11 Columns -->
+                        <div class="col-lg-11">
+                            <div class="row g-5 align-items-start">
+                                <!-- Left Content - 4 columns -->
+                                <div class="col-lg-4">
+                                    <h3 class="skilled-badge mb-3">
+                                        {{instructorsbadge}}
+                                    </h3>
+                                    <h2 class="fw-bold mb-4" style="font-size: 2rem; line-height: 1.3; color: #000000;">
+                                        {{{instructorstitle}}}
+                                    </h2>
+                                    <p class="text-muted mb-4" style="font-size: 0.95rem; line-height: 1.6;">
+                                        {{{instructorsdescription}}}
+                                    </p>
+                                    <a href="{{{ config.wwwroot }}}/admin/user.php" class="btn-see-all-instructors" style="display: inline-block; background: {{instructorsbtncolor}} !important; color: #ffffff; padding: 10px 25px; border-radius: 50px; font-weight: 600; font-size: 0.9rem; text-decoration: none; transition: all 0.3s ease;">
+                                        {{instructorsbutton}} <i class="fa fa-arrow-right ms-2"></i>
+                                    </a>
+                                </div>
+                                
+                                <!-- Right Side - Instructors Cards - 7 columns -->
+                                <div class="col-lg-7">
+                                    <div class="row g-4 {{#instructors_is_slider}}flex-nowrap overflow-auto hide-scrollbar pb-3{{/instructors_is_slider}}">
+                                        {{#instructors}}
+                                        <div class="{{inscolclass}} mb-4">
+                                            <a href="{{{ config.wwwroot }}}/user/profile.php?id={{id}}" class="text-decoration-none">
+                                                <div class="instructor-card-horizontal d-flex align-items-center p-4 rounded-4 bg-white  h-100" style="min-height: 120px;">
+                                                    <div class="instructor-image me-3" style="width: 70px; height: 70px; border-radius: 50%; overflow: hidden; background: #f0f2f5; flex-shrink: 0;">
+                                                        {{#pictureurl}}
+                                                        <img src="{{{ pictureurl }}}" 
+                                                            alt="{{fullname}}" 
+                                                            class="w-100 h-100"
+                                                            style="object-fit: cover;">
+                                                        {{/pictureurl}}
+                                                        {{^pictureurl}}
+                                                        <div class="w-100 h-100 d-flex align-items-center justify-content-center bg-primary text-white" style="font-size: 1.8rem;">
+                                                            {{firstname}}{{lastname}}
+                                                        </div>
+                                                        {{/pictureurl}}
+                                                    </div>
+                                                    <div class="instructor-info">
+                                                        <h5 class="fw-bold mb-1" style="color: #000000; font-size: 1.1rem;">{{fullname}}</h5>
+                                                        <p class="text-muted mb-2" style="font-size: 0.85rem;">{{skill}}</p>
+                                                        <div class="rating">
+                                                            {{#stars_list}}
+                                                            <i class="fa fa-star" style="color: {{#active}}var(--secondary-color, #ffc107){{/active}}{{^active}}#ddd{{/active}}; font-size: 0.8rem;"></i>
+                                                            {{/stars_list}}
+                                                            <span class="text-muted ms-1" style="font-size: 0.75rem;">({{rating}} {{instructorsratingtext}})</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </a>
+                                        </div>
+                                        {{/instructors}}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <style>
+                /* Skilled Introduce Badge - Round Button */
+                .skilled-badge {
+                    display: inline-block;
+                    background: #f0f2f5;
+                    color: var(--primary-color, #5751E1);
+                    padding: 6px 20px;
+                    border-radius: 50px;
+                    font-size: 0.85rem;
+                    font-weight: 600;
+                    letter-spacing: 1px;
+                    text-transform: uppercase;
+                }
+                
+                /* See All Instructors Button */
+                .btn-see-all-instructors {
+                    display: inline-block;
+                    background: transparent;
+                    color: #1a56db;
+                    padding: 10px 0;
+                    font-weight: 600;
+                    font-size: 0.9rem;
+                    text-decoration: none;
+                    transition: all 0.3s ease;
+                    border-bottom: 2px solid #1a56db;
+                }
+                
+                .btn-see-all-instructors:hover {
+                    color: #0b0557;
+                    border-bottom-color: #0b0557;
+                    transform: translateX(5px);
+                    text-decoration: none;
+                }
+                
+                .btn-see-all-instructors i {
+                    transition: transform 0.3s ease;
+                }
+                
+                .btn-see-all-instructors:hover i {
+                    transform: translateX(5px);
+                }
+                
+                /* Horizontal Instructor Cards - Picture on Left */
+                .instructor-card-horizontal {
+                    transition: transform 0.3s ease, box-shadow 0.3s ease;
+                    cursor: pointer;
+                }
+                
+                .instructor-card-horizontal:hover {
+                    transform: translateY(-3px);
+                    box-shadow: 0 10px 25px rgba(0,0,0,0.12) !important;
+                }
+                
+                .instructor-image img {
+                    transition: transform 0.3s ease;
+                }
+                
+                .instructor-card-horizontal:hover .instructor-image img {
+                    transform: scale(1.05);
+                }
+                
+                /* Rating Stars */
+                .rating i {
+                    margin-right: 2px;
+                }
+                
+                @media (max-width: 768px) {
+                    .skilled-introduce-section {
+                        padding: 3rem 0 !important;
+                    }
+                    
+                    .skilled-introduce-section h2 {
+                        font-size: 1.5rem !important;
+                    }
+                    
+                    .skilled-badge {
+                        font-size: 0.7rem;
+                        padding: 4px 15px;
+                    }
+                    
+                    .instructor-card-horizontal {
+                        padding: 1rem !important;
+                        min-height: 100px !important;
+                    }
+                    
+                    .instructor-image {
+                        width: 55px !important;
+                        height: 55px !important;
+                    }
+                    
+                    .instructor-card-horizontal h5 {
+                        font-size: 0.9rem !important;
+                    }
+                    
+                    .instructor-card-horizontal p {
+                        font-size: 0.7rem !important;
+                    }
+                    
+                    .rating span {
+                        font-size: 0.65rem !important;
+                    }
+                }
+                
+                @media (min-width: 769px) and (max-width: 991px) {
+                    .skilled-introduce-section h2 {
+                        font-size: 1.8rem !important;
+                    }
+                    
+                    .col-lg-4, .col-lg-7 {
+                        width: 100%;
+                    }
+                    
+                    .instructor-card-horizontal {
+                        min-height: 110px !important;
+                    }
+                    
+                    .instructor-image {
+                        width: 60px !important;
+                        height: 60px !important;
+                    }
+                }
+            </style>
+            <!-- Testimonials Section -->
+            <section class="testimonials-section py-5" style="background: {{testimonialbg}};">
+                <div class="container">
+                    <div class="row justify-content-center">
+                        <!-- Middle 10 Columns -->
+                        <div class="col-lg-10">
+                            <div class="row g-5 align-items-center">
+                                <!-- Left Side: Image - 5 columns -->
+                                <div class="col-lg-5">
+                                    <div class="testimonial-image-wrapper">
+                                        <img src="{{#testimonialimage}}{{{testimonialimage}}}{{/testimonialimage}}{{^testimonialimage}}{{{ config.wwwroot }}}/theme/mytheme/pix/clients.png{{/testimonialimage}}" 
+                                            alt="Client Testimonial" 
+                                            class="img-fluid rounded-4 w-100  testimonial-img"
+                                            style="width: 100%; height: auto; object-fit: contain;"
+                                            onerror="this.src='https://placehold.co/600x500/f0f2f5/1a56db?text=Testimonial'">
+                                    </div>
+                                </div>
+                                
+                                <!-- Right Side: Testimonial Content - 5 columns -->
+                                <div class="col-lg-5 offset-lg-1">
+                                    <!-- Small Badge -->
+                                    <h3 class="testimonial-badge mb-3">
+                                        Testimonials
+                                    </h3>
+                                    
+                                    <!-- Main Heading -->
+                                    <h2 class="fw-bold mb-4" style="font-size: 2.2rem; line-height: 1.3; color: #000000;">
+                                        What's Our Client Say<br>About Us
+                                    </h2>
+                                    
+                                    <!-- Star Rating -->
+                                    <div class="testimonial-rating mb-4">
+                                        {{#testimonial_stars_list}}
+                                        <i class="fa fa-star" style="color: {{#active}}var(--secondary-color, #ffc107){{/active}}{{^active}}#ddd{{/active}}; font-size: 1.2rem;"></i>
+                                        {{/testimonial_stars_list}}
+                                        <span class="ms-2 fw-bold" style="color: #000;">{{testimonial_stars}}.0</span>
+                                    </div>
+                                    
+                                    <!-- Testimonial Text -->
+                                    <p class="testimonial-text mb-4" style="font-size: 1rem; line-height: 1.7; color: #555555;">
+                                        "{{testimonialtext}}"
+                                    </p>
+                                    
+                                    <!-- Client Name and Title -->
+                                    <h5 class="fw-bold mb-1" style="color: #000000; font-size: 1.1rem;">{{testimonialname}}</h5>
+                                    <p class="text-muted mb-0" style="font-size: 0.85rem;">{{testimonialrole}}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <style>
+                .testimonials-section {
+                    background: transparent;
+                }
+                
+                /* Testimonial Badge - Round Button */
+                .testimonial-badge {
+                    display: inline-block;
+                    background: #f0f2f5;
+                    color: #1a56db;
+                    padding: 6px 20px;
+                    border-radius: 50px;
+                    font-size: 0.85rem;
+                    font-weight: 600;
+                    letter-spacing: 1px;
+                    text-transform: uppercase;
+                    margin-bottom: 0;
+                }
+                
+                .testimonial-rating i {
+                    margin: 0 2px;
+                }
+                
+                .testimonial-text {
+                    font-style: normal;
+                }
+                
+                .testimonial-image-wrapper {
+                    transition: transform 0.3s ease;
+                }
+                
+                .testimonial-image-wrapper:hover {
+                    transform: scale(1.02);
+                }
+                
+                @media (max-width: 768px) {
+                    .testimonials-section {
+                        padding: 3rem 0 !important;
+                    }
+                    
+                    .testimonials-section h2 {
+                        font-size: 1.6rem !important;
+                    }
+                    
+                    .testimonial-badge {
+                        font-size: 0.7rem;
+                        padding: 4px 15px;
+                    }
+                    
+                    .testimonial-text {
+                        font-size: 0.85rem !important;
+                        line-height: 1.5 !important;
+                    }
+                    
+                    .testimonial-rating i {
+                        font-size: 0.9rem !important;
+                    }
+                    
+                    .testimonial-image-wrapper {
+                        margin-bottom: 2rem;
+                    }
+                    
+                    .testimonial-image-wrapper img {
+                        min-height: 250px !important;
+                    }
+                }
+                
+                @media (min-width: 769px) and (max-width: 991px) {
+                    .testimonials-section h2 {
+                        font-size: 1.8rem !important;
+                    }
+                    
+                    .testimonial-text {
+                        font-size: 0.9rem !important;
+                    }
+                    
+                    .testimonial-image-wrapper img {
+                        min-height: 300px !important;
+                    }
+                }
+                
+                @media (max-width: 991px) {
+                    .offset-lg-1 {
+                        margin-left: 0;
+                    }
+                }
+                .testimonial-img {
+                    width: 100% !important;
+                    height: auto !important;
+                    object-fit: contain !important;
+                    min-height: auto !important;
+                }
+</style>
+<!-- Brands Section - Middle 10 Columns -->
+<section class="brands-section py-5" style="background: {{brandssectionbg}};">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="brands-wrapper d-flex flex-wrap align-items-center justify-content-between gap-4">
+                    <div class="brand-item text-center" style="flex: 1; min-width: 100px;">
+                        <img src="{{#brand1}}{{{brand1}}}{{/brand1}}{{^brand1}}{{{ config.wwwroot }}}/theme/mytheme/pix/brands/doordash.png{{/brand1}}" 
+                             alt="Brand 1" 
+                             style="max-width: 100px; height: auto; filter: grayscale(100%); opacity: 0.7; transition: all 0.3s ease;"
+                             onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                        <span style="display: none; font-size: 0.8rem; color: #6c757d;">DOORDASH</span>
+                    </div>
+                    <div class="brand-item text-center" style="flex: 1; min-width: 100px;">
+                        <img src="{{#brand2}}{{{brand2}}}{{/brand2}}{{^brand2}}{{{ config.wwwroot }}}/theme/mytheme/pix/brands/centric.png{{/brand2}}" 
+                             alt="Brand 2" 
+                             style="max-width: 100px; height: auto; filter: grayscale(100%); opacity: 0.7; transition: all 0.3s ease;"
+                             onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                        <span style="display: none; font-size: 0.8rem; color: #6c757d;">CENTRIC</span>
+                    </div>
+                    <div class="brand-item text-center" style="flex: 1; min-width: 100px;">
+                        <img src="{{#brand3}}{{{brand3}}}{{/brand3}}{{^brand3}}{{{ config.wwwroot }}}/theme/mytheme/pix/brands/discord.png{{/brand3}}" 
+                             alt="Brand 3" 
+                             style="max-width: 100px; height: auto; filter: grayscale(100%); opacity: 0.7; transition: all 0.3s ease;"
+                             onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                        <span style="display: none; font-size: 0.8rem; color: #6c757d;">Discord</span>
+                    </div>
+                    <div class="brand-item text-center" style="flex: 1; min-width: 100px;">
+                        <img src="{{#brand4}}{{{brand4}}}{{/brand4}}{{^brand4}}{{{ config.wwwroot }}}/theme/mytheme/pix/brands/airbnb.png{{/brand4}}" 
+                             alt="Brand 4" 
+                             style="max-width: 100px; height: auto; filter: grayscale(100%); opacity: 0.7; transition: all 0.3s ease;"
+                             onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                        <span style="display: none; font-size: 0.8rem; color: #6c757d;">airbnb</span>
+                    </div>
+                    <div class="brand-item text-center" style="flex: 1; min-width: 100px;">
+                        <img src="{{#brand5}}{{{brand5}}}{{/brand5}}{{^brand5}}{{{ config.wwwroot }}}/theme/mytheme/pix/brands/norton.png{{/brand5}}" 
+                             alt="Brand 5" 
+                             style="max-width: 100px; height: auto; filter: grayscale(100%); opacity: 0.7; transition: all 0.3s ease;"
+                             onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                        <span style="display: none; font-size: 0.7rem; color: #6c757d;">Norton by Synaptics</span>
+                    </div>
+                    <div class="brand-item text-center" style="flex: 1; min-width: 100px;">
+                        <img src="{{#brand6}}{{{brand6}}}{{/brand6}}{{^brand6}}{{{ config.wwwroot }}}/theme/mytheme/pix/brands/naturewave.png{{/brand6}}" 
+                             alt="Brand 6" 
+                             style="max-width: 100px; height: auto; filter: grayscale(100%); opacity: 0.7; transition: all 0.3s ease;"
+                             onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                        <span style="display: none; font-size: 0.8rem; color: #6c757d;">naturewave</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+    .brands-section {
+        background: transparent;
+    }
+    
+    .brand-item {
+        transition: transform 0.3s ease;
+        cursor: pointer;
+    }
+    
+    .brand-item:hover img {
+        filter: grayscale(0%) !important;
+        opacity: 1 !important;
+        transform: scale(1.05);
+    }
+    
+    .brand-item:hover {
+        transform: translateY(-3px);
+    }
+    
+    @media (max-width: 768px) {
+        .brands-wrapper {
+            gap: 1.5rem !important;
+        }
+        
+        .brand-item {
+            min-width: calc(50% - 1rem) !important;
+        }
+        
+        .brand-item img {
+            max-width: 80px !important;
+        }
+    }
+    
+    @media (min-width: 769px) and (max-width: 991px) {
+        .brand-item {
+            min-width: calc(33.33% - 1rem) !important;
+        }
+        
+        .brand-item img {
+            max-width: 85px !important;
+        }
+    }
+</style>
+         <!-- News & Blogs Section -->
+<section class="news-blogs-section py-5" style="background-color: var(--blog-bg, #F8F8F8)">
+    <div class="container">
+        <div class="row justify-content-center">
+            <!-- Middle 9.6 Columns -->
+            <div class="col-lg-9-6">
+                <!-- Header Section -->
+                <div class="text-center mb-5">
+                    <div class="d-flex align-items-center justify-content-center mb-3">
+                        <span class="news-badge px-4 py-2 rounded-pill" style="background: var(--blog-badge-bg, #f0f2f5) !important; color: var(--blog-badge-color, #1a56db) !important;">{{blogbadge}}</span>
+                    </div>
+                    <h2 class="fw-bold mb-3" style="font-size: 2.2rem; color: var(--blog-title-color, #000000);">
+                        {{blogtitle}}
+                    </h2>
+                    <p class="text-muted" style="font-size: 0.95rem; max-width: 500px; margin: 0 auto;">
+                        {{{blogdescription}}}
+                    </p>
+                </div>
+                
+                <!-- Blog Cards Row -->
+                <div class="row g-4 {{#blogs_is_slider}}flex-nowrap overflow-auto hide-scrollbar pb-3{{/blogs_is_slider}}">
+                    {{#blogposts}}
+                    <div class="{{blogcolclass}} mb-4">
+                        <div class="blog-card bg-white rounded-4 shadow-sm h-100 overflow-hidden">
+                            <!-- Blog Image - Slightly increased height -->
+                            <a href="{{{ config.wwwroot }}}/blocks/blogpost/view.php?id={{id}}" class="text-decoration-none">
+                                <div class="blog-image position-relative" style="height: 160px; overflow: hidden;">
+                                    {{#image}}
+                                    <img src="{{{ image }}}" class="w-100 h-100" alt="{{title}}" style="object-fit: cover;">
+                                    {{/image}}
+                                    {{^image}}
+                                    <div class="bg-secondary w-100 h-100 d-flex align-items-center justify-content-center" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                                        <i class="fa fa-newspaper" style="font-size: 45px; color: white;"></i>
+                                    </div>
+                                    {{/image}}
+                                    <!-- Category Overlay -->
+                                    <span class="blog-category-overlay position-absolute top-0 start-0 m-3 px-3 py-1 rounded-pill" style="background: #1a56db; color: white; font-size: 0.7rem; font-weight: 600; z-index: 1;">
+                                        {{category}}
+                                    </span>
+                                </div>
+                            </a>
+                            
+                            <!-- Blog Content - Slightly increased padding -->
+                            <div class="blog-content p-3">
+                                <!-- Blog Title -->
+                                <h5 class="fw-bold mb-2" style="font-size: 1rem; line-height: 1.35;">
+                                    <a href="{{{ config.wwwroot }}}/blocks/blogpost/view.php?id={{id}}" class="text-dark text-decoration-none blog-title">
+                                        {{title}}
+                                    </a>
+                                </h5>
+                                
+                                <!-- Blog Excerpt -->
+                                <p class="blog-excerpt text-muted mb-2" style="font-size: 0.85rem; line-height: 1.45;">
+                                    {{content}}
+                                </p>
+                                
+                                <!-- Blog Meta (Author & Date) -->
+                                <div class="blog-meta d-flex align-items-center justify-content-between pt-2 border-top">
+                                    <div class="d-flex align-items-center">
+                                        <i class="fa fa-user-circle text-primary me-1" style="font-size: 0.75rem;"></i>
+                                        <span class="text-muted" style="font-size: 0.7rem;">by {{author}}</span>
+                                    </div>
+                                    <div class="d-flex align-items-center">
+                                        <i class="fa fa-calendar-alt text-primary me-1" style="font-size: 0.7rem;"></i>
+                                        <span class="text-muted" style="font-size: 0.7rem;">{{date}}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {{/blogposts}}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+    .news-blogs-section {
+        background: #F8F8F8;
+    }
+    
+    /* Custom 9.6 columns class */
+    .col-lg-9-6 {
+        position: relative;
+        width: 100%;
+        padding-right: 10px;
+        padding-left: 10px;
+    }
+    
+    /* Desktop: 9.6 columns (80% width) */
+    @media (min-width: 992px) {
+        .col-lg-9-6 {
+            flex: 0 0 80%;
+            max-width: 100%;
+        }
+    }
+    
+    /* News Badge */
+    .news-badge {
+        display: inline-block;
+        background: #f0f2f5;
+        color: #1a56db;
+        font-size: 0.85rem;
+        font-weight: 600;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+    }
+    
+    /* Header Lines */
+    .line {
+        width: 50px;
+        height: 2px;
+        background: #1a56db;
+    }
+    
+    .line-left {
+        margin-right: 15px;
+    }
+    
+    .line-right {
+        margin-left: 15px;
+    }
+    
+    /* Blog Cards */
+    .blog-card {
+        transition: transform 0.2s ease, box-shadow 0.3s ease;
+        cursor: pointer;
+        border: 1px solid #eef2f6;
+    }
+    
+    .blog-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 35px rgba(0,0,0,0.1) !important;
+    }
+    
+    .blog-image {
+        transition: transform 0.2s ease;
+    }
+    
+    .blog-card:hover .blog-image {
+        transform: scale(1.03);
+    }
+    
+    .blog-title:hover {
+        color: #1a56db !important;
+        text-decoration: underline !important;
+    }
+    
+    .blog-excerpt {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+    
+    /* Category Overlay */
+    .blog-category-overlay {
+        backdrop-filter: blur(2px);
+    }
+    
+    .hide-scrollbar::-webkit-scrollbar {
+        display: none;
+    }
+    .hide-scrollbar {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+    
+    /* View All Button */
+    .btn-view-all {
+        display: inline-block;
+        background: transparent;
+        color: #1a56db;
+        padding: 10px 30px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        border: 2px solid #1a56db;
+        border-radius: 50px;
+    }
+    
+    .btn-view-all:hover {
+        background: #1a56db;
+        color: white;
+        transform: translateY(-2px);
+        text-decoration: none;
+        box-shadow: 0 5px 15px rgba(26, 86, 219, 0.3);
+    }
+    
+    .btn-view-all i {
+        transition: transform 0.3s ease;
+    }
+    
+    .btn-view-all:hover i {
+        transform: translateX(5px);
+    }
+    
+    @media (max-width: 768px) {
+        .news-blogs-section {
+            padding: 3rem 0 !important;
+        }
+        
+        .news-blogs-section h2 {
+            font-size: 1.6rem !important;
+        }
+        
+        .news-badge {
+            font-size: 0.7rem;
+            padding: 4px 15px;
+        }
+        
+        .line {
+            width: 30px;
+        }
+        
+        .blog-card {
+            margin-bottom: 1rem;
+        }
+        
+        .blog-content {
+            padding: 1rem !important;
+        }
+        
+        .blog-content h5 {
+            font-size: 0.9rem !important;
+        }
+        
+        .btn-view-all {
+            padding: 8px 25px;
+            font-size: 0.85rem;
+        }
+        
+        .blog-meta {
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        
+        /* Mobile: Full width */
+        .col-lg-9-6 {
+            flex: 0 0 100%;
+            max-width: 100%;
+        }
+    }
+    
+    @media (min-width: 769px) and (max-width: 991px) {
+        .news-blogs-section h2 {
+            font-size: 1.8rem !important;
+        }
+        
+        .blog-content h5 {
+            font-size: 0.9rem !important;
+        }
+        
+        /* Tablet: 10 columns */
+        .col-lg-9-6 {
+            flex: 0 0 83.333%;
+            max-width: 83.333%;
+        }
+    }
+</style>
+
+<!-- Upcoming Events Section -->
+<section class="news-blogs-section py-5" style="background-color: var(--events-bg, #F8F8F8)">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="text-center mb-5">
+                    <span class="news-badge px-4 py-2 rounded-pill" style="background: var(--events-badge-bg, #f0f2f5) !important; color: var(--events-badge-color, #1a56db) !important;">{{eventsbadge}}</span>
+                    <h2 class="fw-bold mb-3" style="font-size: 2.2rem; color: var(--events-title-color, #000000);">{{eventstitle}}</h2>
+                </div>
+                
+                <div class="row g-4 {{#events_is_slider}}flex-nowrap overflow-auto hide-scrollbar pb-3{{/events_is_slider}}">
+                    {{#calendar_events}}
+                    <div class="{{eventscolclass}} mb-4">
+                        <a href="{{url}}" class="text-decoration-none">
+                            <div class="blog-card bg-white rounded-4 shadow-sm h-100 overflow-hidden">
+                                <!-- Event Image -->
+                                <div class="blog-image" style="height: 180px; overflow: hidden;">
+                                    {{#image}}
+                                    <img src="{{{image}}}" class="w-100 h-100" alt="{{title}}" style="object-fit: cover;">
+                                    {{/image}}
+                                    {{^image}}
+                                    <div class="w-100 h-100 d-flex align-items-center justify-content-center" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                                        <i class="fa fa-calendar-alt" style="font-size: 50px; color: white; opacity: 0.6;"></i>
+                                    </div>
+                                    {{/image}}
+                                </div>
+                                
+                                <div class="p-3">
+                                    <!-- Event Type -->
+                                    <span class="d-inline-block px-3 py-1 rounded-pill mb-2" style="background: #1a56db; color: white; font-size: 0.7rem; font-weight: 600;">
+                                        {{type_label}}
+                                    </span>
+                                    
+                                    <!-- Event Title -->
+                                    <h5 class="fw-bold mb-2" style="font-size: 1rem; line-height: 1.35;">
+                                        <span class="text-dark blog-title">{{title}}</span>
+                                    </h5>
+                                    
+                                    <!-- Meta -->
+                                    <div class="blog-meta d-flex align-items-center justify-content-between pt-2 border-top">
+                                        <div class="d-flex align-items-center">
+                                            <i class="fa fa-user-circle text-primary me-1" style="font-size: 0.75rem;"></i>
+                                            <span class="text-muted" style="font-size: 0.7rem;">by {{author}}</span>
+                                        </div>
+                                        <div class="d-flex align-items-center">
+                                            <i class="fa fa-calendar-alt text-primary me-1" style="font-size: 0.7rem;"></i>
+                                            <span class="text-muted" style="font-size: 0.7rem;">{{date}}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    {{/calendar_events}}
+                    {{^calendar_events}}
+                    <div class="col-12 text-center">
+                        <p class="text-muted">No upcoming events at this time.</p>
+                    </div>
+                    {{/calendar_events}}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+          <!-- Call to Action Section - Middle 9 Columns, No Vertical Space -->
+        <section class="cta-section py-0" style="background: #F8F8F8; padding: 25px 0 0 0 !important; margin: 0 !important;">
+            <div class="container" style="padding: 0 !important; margin: 0 auto !important; max-width: 1200px;">
+                <div class="row justify-content-center" style="margin: 0 !important; padding: 0 !important;">
+                    <div class="col-lg-9" style="padding: 0 !important;">
+                        <div class="cta-card p-4 rounded-4 shadow-lg d-flex align-items-center justify-content-between flex-wrap" style="background: {{bottomctabg}}; margin: 0; padding-left: 50px !important; padding-right: 30px !important;">
+                            <!-- Left Side: Text -->
+                            <div class="cta-text" style="padding-left: 20px;">
+                                <h3 class="fw-bold text-white mb-0" style="font-size: 1.5rem; line-height: 1.3; margin: 0;">
+                                    Start Today And Get Certified In<br>Fundamentals Of Business Core
+                                </h3>
+                            </div>
+                            
+                            <!-- Right Side: Button -->
+                            <div class="cta-button">
+                                <a href="{{{ config.wwwroot }}}/course/" class="btn-cta" style="display: inline-block; background: white; color: black; padding: 8px 14px; font-weight: 600; font-size: 0.7rem; text-decoration: none; transition: all 0.3s ease; border-radius: 4px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); letter-spacing: 0.5px; white-space: nowrap; border: none;">
+                                    Get Started Now <i class="fa fa-arrow-right ms-2"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <style>
+            /* Remove ALL vertical spacing */
+            .cta-section {
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+            
+            .cta-section .container {
+                padding: 0 !important;
+            }
+            
+            .cta-section .row {
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+            
+            .cta-section [class*="col-"] {
+                padding: 0 !important;
+            }
+            
+            .cta-card {
+                transition: transform 0.3s ease, box-shadow 0.3s ease;
+                min-height: 120px;
+            }
+            
+            .cta-card:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 20px 40px rgba(0,0,0,0.2) !important;
+            }
+            
+            /* Button styles - less round (8px border-radius), medium size */
+            .btn-cta {
+                display: inline-block;
+                background: white;
+                color: black;
+                padding: 8px 28px;
+                font-weight: 600;
+                font-size: 0.9rem;
+                text-decoration: none;
+                transition: all 0.3s ease;
+                border-radius: 8px;
+                box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+                letter-spacing: 0.5px;
+                white-space: nowrap;
+                border: none;
+                cursor: pointer;
+            }
+            
+            .btn-cta:hover {
+                background: #f8f9fa;
+                color: #1e3a8a;
+                transform: translateY(-2px);
+                box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+                text-decoration: none;
+            }
+            
+            .btn-cta:hover i {
+                transform: translateX(5px);
+            }
+            
+            .btn-cta i {
+                transition: transform 0.3s ease;
+            }
+            
+            @media (max-width: 768px) {
+                .cta-card {
+                    padding: 1.5rem !important;
+                    flex-direction: column !important;
+                    text-align: center;
+                    gap: 20px;
+                }
+                
+                .cta-text {
+                    padding-left: 0 !important;
+                }
+                
+                .cta-text h2 {
+                    font-size: 1.3rem !important;
+                }
+                
+                .btn-cta {
+                    padding: 8px 24px;
+                    font-size: 0.85rem;
+                    white-space: nowrap;
+                }
+            }
+            
+            @media (min-width: 769px) and (max-width: 991px) {
+                .cta-card {
+                    padding-left: 30px !important;
+                    padding-right: 30px !important;
+                }
+                
+                .cta-text {
+                    padding-left: 10px !important;
+                }
+                
+                .cta-text h2 {
+                    font-size: 1.3rem !important;
+                }
+                
+                .btn-cta {
+                    padding: 8px 24px;
+                    font-size: 0.85rem;
+                }
+            }
+        </style>
+        {{#js}}
+        // Counter animation for stats numbers
+        function animateCounter(element, start, end, duration) {
+            let startTimestamp = null;
+            const step = (timestamp) => {
+                if (!startTimestamp) startTimestamp = timestamp;
+                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                element.innerText = Math.floor(progress * (end - start) + start);
+                if (progress < 1) {
+                    window.requestAnimationFrame(step);
+                }
+            };
+            window.requestAnimationFrame(step);
+        }
+
+        // Animate the dynamic stats numbers
+        const observerOptions = {
+            threshold: 0.3,
+            rootMargin: "0px"
+        };
+
+        const statsObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    // Find all number elements in the dynamic stats section
+                    const statNumbers = document.querySelectorAll('.dynamic-stats-section h3');
+                    statNumbers.forEach(stat => {
+                        const targetCount = parseInt(stat.innerText);
+                        if (targetCount > 0 && !stat.hasAttribute('data-animated')) {
+                            stat.setAttribute('data-animated', 'true');
+                            // Start from 0 and count up
+                            stat.innerText = '0';
+                            animateCounter(stat, 0, targetCount, 1500);
+                        }
+                    });
+                    statsObserver.unobserve(entry.target);
+                }
+            });
+        }, observerOptions);
+
+        const dynamicStatsSection = document.querySelector('.dynamic-stats-section');
+        if (dynamicStatsSection) {
+            statsObserver.observe(dynamicStatsSection);
+        }
+
+        // Live Search Functionality
+(function() {
+    const searchInput = document.getElementById('liveSearchInput');
+    const resultsContainer = document.getElementById('liveSearchResults');
+    const searchBtn = document.getElementById('searchSubmitBtn');
+    let searchTimeout;
+    let currentSearchTerm = '';
+    let isSearching = false;
+
+    if (!searchInput || !resultsContainer) {
+        console.warn('Live search elements not found');
+        return;
+    }
+
+    // Function to highlight search term
+    function highlightText(text, term) {
+        if (!text || !term || term.length < 2) return text;
+        try {
+            const regex = new RegExp(`(${term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+            return text.replace(regex, '<span class="live-search-highlight">$1</span>');
+        } catch (e) {
+            return text;
+        }
+    }
+
+    // Helper function to escape HTML
+    function escapeHtml(text) {
+        if (!text) return '';
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    // Function to perform search
+    function performSearch(searchTerm) {
+        if (!searchTerm || searchTerm.length < 2) {
+            resultsContainer.classList.remove('show');
+            resultsContainer.innerHTML = '';
+            return;
+        }
+
+        if (isSearching) return;
+        
+        currentSearchTerm = searchTerm;
+        isSearching = true;
+        
+        // Show loading state
+        resultsContainer.innerHTML = '<div class="live-search-loading"><i class="fa fa-spinner fa-spin"></i> Searching courses...</div>';
+        resultsContainer.classList.add('show');
+
+        const ajaxUrl = '{{{ config.wwwroot }}}/theme/mytheme/ajax_search.php?q=' + encodeURIComponent(searchTerm);
+        
+        fetch(ajaxUrl, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            credentials: 'same-origin'
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('HTTP ' + response.status);
+            }
+            return response.json();
+        })
+        .then(data => {
+            isSearching = false;
+            
+            // Only update if this is still the current search term
+            if (currentSearchTerm !== searchTerm) return;
+            
+            // Check if data is an array
+            if (!data || !Array.isArray(data)) {
+                console.warn('Invalid response format:', data);
+                resultsContainer.innerHTML = '<div class="live-search-no-results">Unable to load results. Please try again.</div>';
+                return;
+            }
+            
+            if (data.length === 0) {
+                resultsContainer.innerHTML = '<div class="live-search-no-results">No courses found matching "' + escapeHtml(searchTerm) + '"</div>';
+                return;
+            }
+
+            // Build results HTML
+            let html = '';
+            data.forEach(course => {
+                if (!course || !course.id) return;
+                
+                const courseImage = course.image ? 
+                    `<img src="${course.image}" class="live-search-item-image" alt="${escapeHtml(course.fullname)}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">` :
+                    `<div class="live-search-item-image d-flex align-items-center justify-content-center bg-primary text-white">
+                        <i class="fa fa-book"></i>
+                    </div>`;
+                
+                html += `
+                    <a href="${escapeHtml(course.url)}" class="live-search-item" data-course-id="${course.id}">
+                        ${courseImage}
+                        <div class="live-search-item-content">
+                            <div class="live-search-item-title">${highlightText(escapeHtml(course.fullname), searchTerm)}</div>
+                            ${course.categoryname ? `<div class="live-search-item-category"><i class="fa fa-folder"></i> ${escapeHtml(course.categoryname)}</div>` : ''}
+                            ${course.summary ? `<div class="live-search-item-summary">${highlightText(escapeHtml(course.summary), searchTerm)}</div>` : ''}
+                            <div class="live-search-item-meta">
+                                <span><i class="fa fa-users"></i> ${course.studentcount || 0} students</span>
+                            </div>
+                        </div>
+                    </a>
+                `;
+            });
+            resultsContainer.innerHTML = html;
+        })
+        .catch(error => {
+            isSearching = false;
+            console.error('Search error:', error);
+            resultsContainer.innerHTML = '<div class="live-search-no-results">Error loading results. Please check your connection and try again.</div>';
+        });
+    }
+
+    // Input event with debounce
+    let debounceTimeout;
+    searchInput.addEventListener('input', function(e) {
+        const searchTerm = e.target.value.trim();
+        
+        clearTimeout(debounceTimeout);
+        debounceTimeout = setTimeout(() => {
+            performSearch(searchTerm);
+        }, 400);
+    });
+
+    // Focus event - show results if there's a search term
+    searchInput.addEventListener('focus', function() {
+        const searchTerm = this.value.trim();
+        if (searchTerm.length >= 2 && resultsContainer.innerHTML && resultsContainer.innerHTML !== '' && !resultsContainer.innerHTML.includes('no courses')) {
+            resultsContainer.classList.add('show');
+        }
+    });
+
+    // Click outside to close results
+    document.addEventListener('click', function(e) {
+        if (searchInput && resultsContainer && 
+            !searchInput.contains(e.target) && 
+            !resultsContainer.contains(e.target)) {
+            resultsContainer.classList.remove('show');
+        }
+    });
+
+    // Escape key to close results
+    searchInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            resultsContainer.classList.remove('show');
+            this.blur();
+        }
+    });
+
+    // Submit on enter key (fallback to normal search)
+    searchInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            const searchTerm = this.value.trim();
+            if (searchTerm) {
+                window.location.href = '{{{ config.wwwroot }}}/course/search.php?search=' + encodeURIComponent(searchTerm);
+            }
+        }
+    });
+
+    // Search button click
+    if (searchBtn) {
+        searchBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const searchTerm = searchInput.value.trim();
+            if (searchTerm) {
+                window.location.href = '{{{ config.wwwroot }}}/course/search.php?search=' + encodeURIComponent(searchTerm);
+            }
+        });
+    }
+
+    // Keyboard navigation for results
+    let selectedIndex = -1;
+    
+    searchInput.addEventListener('keydown', function(e) {
+        const items = document.querySelectorAll('.live-search-item');
+        if (items.length === 0) return;
+        
+        if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            selectedIndex = Math.min(selectedIndex + 1, items.length - 1);
+            updateSelectedItem(items);
+        } else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            selectedIndex = Math.max(selectedIndex - 1, -1);
+            updateSelectedItem(items);
+        } else if (e.key === 'Enter' && selectedIndex >= 0) {
+            e.preventDefault();
+            const selectedItem = items[selectedIndex];
+            if (selectedItem && selectedItem.href) {
+                window.location.href = selectedItem.href;
+            }
+        }
+    });
+    
+    function updateSelectedItem(items) {
+        items.forEach((item, index) => {
+            if (index === selectedIndex) {
+                item.style.backgroundColor = '#f8f9fa';
+                item.style.outline = '2px solid var(--primary-color)';
+                item.scrollIntoView({ block: 'nearest' });
+            } else {
+                item.style.backgroundColor = '';
+                item.style.outline = '';
+            }
+        });
+    }
+    
+    // Ctrl+K / Cmd+K shortcut to focus search
+    document.addEventListener('keydown', function(e) {
+        if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+            e.preventDefault();
+            if (searchInput) {
+                searchInput.focus();
+                searchInput.select();
+            }
+        }
+    });
+})();
+        {{/js}}
+    </div>
+    {{/content}}
+{{/ theme_mytheme/drawers }}

@@ -1,0 +1,919 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template theme_mytheme/navbar
+
+    Custom navbar override for mytheme
+}}
+{{#isloggedin}}
+<nav class="navbar fixed-top navbar-expand-lg navbar-light bg-white shadow-sm" aria-label="{{#str}}sitemenubar, admin{{/str}}">
+    <div class="container-fluid px-2 px-md-3">
+        <!-- LEFT TOGGLE - Mobile menu button -->
+        <button class="navbar-toggler d-lg-none ms-0 me-2 border-0" 
+                type="button" 
+                id="mobileMenuToggle"
+                aria-label="Toggle navigation menu">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <!-- Logo/Brand -->
+        <a href="{{{ config.wwwroot }}}/index.php?redirect=0" class="navbar-brand d-none d-lg-flex align-items-center m-0 p-0 me-2 me-md-3" aria-label="{{{ sitename }}}">
+            {{#logo_url}}
+                <img src="{{{logo_url}}}" class="logo me-2" alt="{{sitename}}" height="35" width="auto">
+            {{/logo_url}}
+            {{^logo_url}}
+                {{#output.should_display_navbar_logo}}
+                    <img src="{{output.get_compact_logo_url}}" class="logo me-2" alt="{{sitename}}" height="35" width="auto">
+                {{/output.should_display_navbar_logo}}
+                {{^output.should_display_navbar_logo}}
+                    <span class="site-name fw-bold text-primary d-none d-sm-inline">{{{ sitename }}}</span>
+                {{/output.should_display_navbar_logo}}
+            {{/logo_url}}
+        </a>
+
+        <!-- RIGHT TOGGLE - Profile dropdown button (Mobile only) -->
+        <div class="dropdown ms-auto d-lg-none">
+            <button class="btn btn-link text-dark text-decoration-none p-0 border-0 bg-transparent" 
+                    type="button" 
+                    id="mobileProfileToggle" 
+                    aria-expanded="false">
+                <span class="user-avatar-small-initials-mobile">
+                    {{ user_initials }}
+                </span>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end" id="mobileProfileMenu" aria-labelledby="mobileProfileToggle">
+                <li><a class="dropdown-item" href="{{{ config.wwwroot }}}/user/profile.php">
+                    <i class="fa fa-user me-2"></i> Profile
+                </a></li>
+                <li><a class="dropdown-item" href="{{{ config.wwwroot }}}/grade/report/overview/index.php">
+                    <i class="fa fa-graduation-cap me-2"></i> Grades
+                </a></li>
+                <li><a class="dropdown-item" href="{{{ config.wwwroot }}}/calendar/view.php">
+                    <i class="fa fa-calendar me-2"></i> Calendar
+                </a></li>
+                <li><a class="dropdown-item" href="{{{ config.wwwroot }}}/user/files.php">
+                    <i class="fa fa-file me-2"></i> Private files
+                </a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item" href="{{{ config.wwwroot }}}/user/preferences.php">
+                    <i class="fa fa-cog me-2"></i> Preferences
+                </a></li>
+                {{#isadmin}}
+                <li><hr class="dropdown-divider"></li>
+                <li class="px-3 py-2 d-flex justify-content-center align-items-center edit-mode-container">
+                    <div class="edit-mode-button-only">
+                        {{{ edit_mode_button_mobile }}}
+                    </div>
+                </li>
+                <li><a class="dropdown-item admin-only-link" href="{{{ config.wwwroot }}}/admin/search.php">
+                    Site administration
+                </a></li>
+                {{/isadmin}}
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item" href="{{{ config.wwwroot }}}/login/logout.php">
+                    <i class="fa fa-sign-out me-2"></i> Log out
+                </a></li>
+            </ul>
+        </div>
+
+        <!-- Desktop Navigation Menu -->
+        <div class="collapse navbar-collapse" id="customNavMenu">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link" href="{{{ config.wwwroot }}}/index.php?redirect=0">
+                        <i class="fa fa-home d-lg-none me-2"></i>{{navhome}}
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{{ config.wwwroot }}}/my/courses.php">
+                        <i class="fa fa-book d-lg-none me-2"></i>{{navcourses}}
+                    </a>
+                </li>
+                <!-- Pages link -->
+                <li class="nav-item">
+                    <a class="nav-link" href="{{{ config.wwwroot }}}/course/search.php">
+                        <i class="fa fa-folder d-lg-none me-2"></i>{{navpages}}
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{{ config.wwwroot }}}/my/">
+                        <i class="fa fa-dashboard d-lg-none me-2"></i>{{navdashboard}}
+                    </a>
+                </li>
+                {{#isadmin}}
+                 <li class="nav-item">
+                <a class="nav-link admin-only-link" href="{{{ config.wwwroot }}}/admin/search.php">
+                    Site administration
+                </a>
+                {{/isadmin}}
+            </ul>
+
+            <!-- Right Side Elements (Categories, Search) -->
+            <ul class="navbar-nav ms-auto align-items-center d-flex">
+                <!-- Categories Mega Menu Box (Right Side) -->
+                <li class="nav-item dropdown position-static">
+                    <a class="nav-link dropdown-toggle categories-link d-flex align-items-center" 
+                       href="#" 
+                       id="categoriesDropdown" 
+                       role="button" 
+                       data-bs-toggle="dropdown" 
+                       aria-expanded="false">
+                        <span class="categories-label">{{navcategories}}</span>
+                        <i class="fa fa-chevron-down ms-1 small"></i>
+                    </a>
+                    <div class="dropdown-menu mega-menu-box shadow-lg border-0 rounded-4" aria-labelledby="categoriesDropdown">
+                        <div class="container py-3">
+                            <div class="mega-menu-list">
+                                {{#navbar_categories}}
+                                <div class="mega-menu-list-item">
+                                    <a href="{{{url}}}" class="dropdown-item py-2 px-3 rounded-2">
+                                        <i class="fa fa-angle-right me-2 text-primary small"></i>
+                                        {{name}}
+                                    </a>
+                                </div>
+                                {{/navbar_categories}}
+                                {{^navbar_categories}}
+                                <div class="p-3 text-muted">No categories available.</div>
+                                {{/navbar_categories}}
+                            </div>
+                        </div>
+                    </div>
+                </li>
+                <!-- Search Icon (Right Side) -->
+                <li class="nav-item">
+                    <a class="nav-link" href="{{{ config.wwwroot }}}/course/search.php" id="searchButtonDesktop" title="{{navsearch}}">
+                        <span class="icon-circle-glass">
+                            <i class="fa fa-search"></i>
+                        </span>
+                    </a>
+                </li>
+                {{{ output.navbar_plugin_output }}}
+                <!-- Desktop User Menu - Only Initials, No Name -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle user-menu-toggle d-flex align-items-center" 
+                    href="#" 
+                    id="userMenuDropdown" 
+                    role="button" 
+                    data-bs-toggle="dropdown-custom" 
+                    data-bs-auto-close="outside"
+                    aria-expanded="false">
+                        <span class="user-avatar-small-initials">
+                            {{ user_initials }}
+                        </span>
+                        <i class="fa fa-chevron-down ms-1 small dropdown-arrow-icon"></i>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end shadow border-0" aria-labelledby="userMenuDropdown">
+                        <li><a class="dropdown-item" href="{{{ config.wwwroot }}}/user/profile.php">
+                            <i class="fa fa-user me-2"></i> Profile
+                        </a></li>
+                        <li><a class="dropdown-item" href="{{{ config.wwwroot }}}/grade/report/overview/index.php">
+                            <i class="fa fa-graduation-cap me-2"></i> Grades
+                        </a></li>
+                        <li><a class="dropdown-item" href="{{{ config.wwwroot }}}/calendar/view.php">
+                            <i class="fa fa-calendar me-2"></i> Calendar
+                        </a></li>
+                        <li><a class="dropdown-item" href="{{{ config.wwwroot }}}/user/files.php">
+                            <i class="fa fa-file me-2"></i> Private files
+                        </a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="{{{ config.wwwroot }}}/user/preferences.php">
+                            <i class="fa fa-cog me-2"></i> Preferences
+                        </a></li>
+                       
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="{{{ config.wwwroot }}}/login/logout.php">
+                            <i class="fa fa-sign-out me-2"></i> Log out
+                        </a></li>
+                    </ul>
+                </li>
+                {{#isadmin}}
+                        
+                        <li class="px-3 py-2 d-flex justify-content-center align-items-center edit-mode-container">
+                            <div class="edit-mode-button-only">
+                                {{{ edit_mode_button }}}
+                            </div>
+                        </li>
+                       
+                        {{/isadmin}}
+                {{#langmenu}}
+                <li class="nav-item">
+                    {{> theme_boost/language_menu }}
+                </li>
+                {{/langmenu}}
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- Search Modal -->
+<div class="modal fade" id="searchModal" tabindex="-1" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title" id="searchModalLabel">{{navsearch}}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body pt-0">
+                <form action="{{{ config.wwwroot }}}/course/search.php" method="get" class="mt-3">
+                    <div class="input-group">
+                        <input type="text" 
+                               class="form-control form-control-lg" 
+                               name="search" 
+                               placeholder="{{navsearch}}" 
+                               aria-label="Search courses">
+                        <button class="btn btn-primary btn-lg" type="submit">
+                            <i class="fa fa-search"></i> Search
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Mobile Side Menu Panel -->
+<div class="mobile-menu-panel" id="mobileMenuPanel" style="display: none;">
+    <div class="mobile-menu-header">
+        <div class="d-flex justify-content-between align-items-center p-3 border-bottom">
+            <h5 class="mb-0 fw-bold text-primary">Menu</h5>
+            <button type="button" class="btn-close" id="closeMobileMenu" aria-label="Close"></button>
+        </div>
+    </div>
+    <div class="mobile-menu-body">
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <a class="nav-link" href="{{{ config.wwwroot }}}/index.php?redirect=0">
+                    <i class="fa fa-home me-3"></i> {{navhome}}
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{{ config.wwwroot }}}/my/courses.php">
+                    <i class="fa fa-book me-3"></i> {{navcourses}}
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{{ config.wwwroot }}}/course/search.php">
+                    <i class="fa fa-folder me-3"></i> {{navpages}}
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{{ config.wwwroot }}}/my/">
+                    <i class="fa fa-dashboard me-3"></i> {{navdashboard}}
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link d-flex justify-content-between align-items-center" 
+                   href="#mobileCategoriesSubmenu" 
+                   id="mobileCategoriesBtn"
+                   data-bs-toggle="collapse" 
+                   role="button" 
+                   aria-expanded="false">
+                    <span><i class="fa fa-th-large me-3"></i> {{navcategories}}</span>
+                    <i class="fa fa-chevron-down small"></i>
+                </a>
+                <div class="collapse" id="mobileCategoriesSubmenu">
+                    <ul class="nav flex-column ps-4 bg-light">
+                        <li class="nav-item">
+                            <a class="nav-link py-2 text-primary fw-bold" href="{{{ config.wwwroot }}}/course/index.php">
+                                <i class="fa fa-th-large me-2"></i> All Categories
+                            </a>
+                        </li>
+                        {{#navbar_categories}}
+                        <li class="nav-item">
+                            <a class="nav-link py-2" href="{{{url}}}">
+                                {{name}}
+                            </a>
+                        </li>
+                        {{/navbar_categories}}
+                    </ul>
+                </div>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{{ config.wwwroot }}}/course/search.php" id="mobileSearchBtn">
+                    <i class="fa fa-search me-3"></i> {{navsearch}}
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{{ config.wwwroot }}}/message/output/popup/notifications.php">
+                    <i class="fa fa-bell me-3"></i> Notifications
+                </a>
+            </li>
+            
+        </ul>
+    </div>
+</div>
+<div class="mobile-menu-overlay" id="mobileMenuOverlay" style="display: none;"></div>
+
+<!-- Categories Submenu for Mobile -->
+<div class="mobile-submenu-panel" id="mobileSubmenuPanel" style="display: none;">
+    <div class="mobile-submenu-header">
+        <div class="d-flex align-items-center p-3 border-bottom">
+            <button class="btn btn-link text-dark p-0 me-3" id="backToMainMenu">
+                <i class="fa fa-arrow-left"></i>
+            </button>
+            <h5 class="mb-0 fw-bold text-primary">Categories</h5>
+        </div>
+    </div>
+    <div class="mobile-submenu-body">
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <a class="nav-link" href="{{{ config.wwwroot }}}/course/index.php">
+                    <i class="fa fa-th-large me-3"></i> All Categories
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{{ config.wwwroot }}}/course/index.php?categoryid=1">
+                    <i class="fa fa-folder me-3"></i> General
+                </a>
+            </li>
+        </ul>
+    </div>
+</div>
+{{/isloggedin}}
+
+{{^isloggedin}}
+<nav class="navbar fixed-top navbar-expand-lg navbar-light bg-white shadow-sm" aria-label="Site menu bar">
+    <div class="container-fluid px-2 px-md-3">
+        <button class="navbar-toggler d-lg-none ms-0 me-2 border-0" 
+                type="button" 
+                id="mobileMenuToggleGuest"
+                aria-label="Toggle navigation menu">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <a href="{{{ config.wwwroot }}}/index.php?redirect=0" class="navbar-brand d-none d-lg-flex align-items-center m-0 p-0 me-2 me-md-3" aria-label="{{{ sitename }}}">
+            {{#logo_url}}
+                <img src="{{{logo_url}}}" class="logo me-2" alt="{{sitename}}" height="35" width="auto">
+            {{/logo_url}}
+            {{^logo_url}}
+                {{#output.should_display_navbar_logo}}
+                    <img src="{{output.get_compact_logo_url}}" class="logo me-2" alt="{{sitename}}" height="35" width="auto">
+                {{/output.should_display_navbar_logo}}
+                {{^output.should_display_navbar_logo}}
+                    <span class="site-name fw-bold text-primary d-none d-sm-inline">{{{ sitename }}}</span>
+                {{/output.should_display_navbar_logo}}
+            {{/logo_url}}
+        </a>
+
+       <!-- Mobile: Try for free button -->
+            <a href="{{{ config.wwwroot }}}/login/signup.php" class="btn-try-free-upper btn-sm d-lg-none ms-auto">
+                <i class="fa fa-rocket me-1"></i> {{navtryfree}}
+            </a>
+
+        <div class="collapse navbar-collapse" id="customNavMenuGuest">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link" href="{{{ config.wwwroot }}}/index.php?redirect=0">{{navhome}}</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{{ config.wwwroot }}}/course/index.php">{{navcourses}}</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{{ config.wwwroot }}}/course/search.php">{{navpages}}</a>
+                </li>
+            </ul>
+            
+            <!-- Desktop: Try for free button instead of Login -->
+            <div class="ms-auto d-none d-lg-flex align-items-center gap-2">
+                <a href="{{{ config.wwwroot }}}/login/signup.php" class="btn-try-free-upper">
+                    <i class="fa fa-rocket me-2"></i>{{navtryfree}}
+                </a>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<div class="mobile-menu-panel" id="mobileMenuPanelGuest" style="display: none;">
+    <div class="mobile-menu-header">
+        <div class="d-flex justify-content-between align-items-center p-3 border-bottom">
+            <h5 class="mb-0 fw-bold text-primary">Menu</h5>
+            <button type="button" class="btn-close" id="closeMobileMenuGuest" aria-label="Close"></button>
+        </div>
+    </div>
+    <div class="mobile-menu-body">
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <a class="nav-link" href="{{{ config.wwwroot }}}/index.php?redirect=0">
+                    <i class="fa fa-home me-3"></i> {{navhome}}
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{{ config.wwwroot }}}/course/index.php">
+                    <i class="fa fa-book me-3"></i> {{navcourses}}
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{{ config.wwwroot }}}/course/search.php">
+                    <i class="fa fa-folder me-3"></i> {{navpages}}
+                </a>
+            </li>
+            <!-- REMOVED: Try for free button from mobile menu -->
+            <li class="nav-item mt-2 px-3">
+                <a href="{{{ config.wwwroot }}}/login/index.php" class="btn btn-primary w-100 text-center d-block">
+                    <i class="fa fa-sign-in me-2"></i>{{navlogin}}
+                </a>
+            </li>
+        </ul>
+    </div>
+</div>
+<div class="mobile-menu-overlay" id="mobileMenuOverlayGuest" style="display: none;"></div>
+{{/isloggedin}}
+
+<style>
+/* CSS to hide the text label on the edit mode toggle button globally within our containers */
+.edit-mode-button-only button,
+.edit-mode-button-only .btn,
+.edit-mode-container .btn {
+    white-space: nowrap;
+}
+
+/* Hide internal "Edit mode" text instantly without breaking the switch UI */
+.edit-mode-button-only label, 
+.edit-mode-container label,
+.edit-mode-button-only .form-check-label,
+.edit-mode-container .form-check-label {
+    width: 35px !important;
+    overflow: hidden !important;
+    white-space: nowrap !important;
+    text-indent: 100px !important; /* Push text out of view */
+    margin-bottom: 0 !important;
+    padding-left: 0 !important;
+}
+
+.edit-mode-button-only .btn span:not(.icon),
+.edit-mode-container .btn span:not(.icon) {
+    display: none !important;
+}
+
+.edit-mode-button-only .btn .icon,
+.edit-mode-container .btn .icon {
+    margin-right: 0 !important;
+}
+
+/* Keep the icon visible and adjust spacing */
+.edit-mode-button-only .btn i,
+.edit-mode-button-only .btn .fa,
+.edit-mode-container .btn i,
+.edit-mode-container .btn .fa {
+    margin-right: 0 !important;
+}
+</style>
+
+{{#js}}
+require(['jquery', 'core/ajax', 'core/notification', 'core/str'], function($, Ajax, Notification, Str) {
+    
+    // ===== MOBILE PROFILE DROPDOWN - FIXED POSITIONING =====
+    function initMobileProfileDropdown() {
+        var mobileBtn = document.getElementById('mobileProfileToggle');
+        var mobileMenu = document.getElementById('mobileProfileMenu');
+
+        if (!mobileBtn || !mobileMenu) {
+            return;
+        }
+
+        // Remove old event listeners by cloning
+        var newBtn = mobileBtn.cloneNode(true);
+        mobileBtn.parentNode.replaceChild(newBtn, mobileBtn);
+        mobileBtn = newBtn;
+        mobileMenu = document.getElementById('mobileProfileMenu');
+
+        // Position the dropdown properly
+        function positionDropdown() {
+            if (window.innerWidth < 992) {
+                mobileMenu.style.position = 'fixed';
+                mobileMenu.style.top = '60px';
+                mobileMenu.style.right = '10px';
+                mobileMenu.style.left = 'auto';
+                mobileMenu.style.transform = 'none';
+                mobileMenu.style.width = '280px';
+                mobileMenu.style.maxWidth = 'calc(100vw - 20px)';
+                mobileMenu.style.zIndex = '9999';
+                mobileMenu.style.borderRadius = '12px';
+                mobileMenu.style.boxShadow = '0 8px 30px rgba(0, 0, 0, 0.2)';
+            }
+        }
+
+        // Initial positioning
+        positionDropdown();
+
+        // Reposition on resize
+        window.addEventListener('resize', positionDropdown);
+
+        mobileBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            // Reposition before showing
+            positionDropdown();
+
+            if (mobileMenu.classList.contains('show')) {
+                mobileMenu.classList.remove('show');
+                mobileBtn.setAttribute('aria-expanded', 'false');
+            } else {
+                // Close all other dropdowns first
+                document.querySelectorAll('.dropdown-menu').forEach(function(menu) {
+                    menu.classList.remove('show');
+                });
+                document.querySelectorAll('.navbar .dropdown-toggle').forEach(function(toggle) {
+                    toggle.setAttribute('aria-expanded', 'false');
+                });
+                
+                mobileMenu.classList.add('show');
+                mobileBtn.setAttribute('aria-expanded', 'true');
+            }
+        });
+
+        // Close when clicking outside
+        $(document).off('click.mythemeMobileProfile').on('click.mythemeMobileProfile', function(e) {
+            var btn = document.getElementById('mobileProfileToggle');
+            var menu = document.getElementById('mobileProfileMenu');
+            if (!btn || !menu || !menu.classList.contains('show')) {
+                return;
+            }
+            if (!btn.contains(e.target) && !menu.contains(e.target)) {
+                menu.classList.remove('show');
+                btn.setAttribute('aria-expanded', 'false');
+            }
+        });
+
+        // Close on Escape key
+        $(document).off('keydown.mythemeMobileProfile').on('keydown.mythemeMobileProfile', function(e) {
+            if (e.key !== 'Escape') {
+                return;
+            }
+            var btn = document.getElementById('mobileProfileToggle');
+            var menu = document.getElementById('mobileProfileMenu');
+            if (menu && menu.classList.contains('show')) {
+                menu.classList.remove('show');
+                if (btn) {
+                    btn.setAttribute('aria-expanded', 'false');
+                }
+            }
+        });
+    }
+
+    // ===== CLICK OUTSIDE / ESCAPE HANDLER FOR ALL DROPDOWNS =====
+    function initGlobalDropdownClosers() {
+        $(document).on('click.mythemeGlobal', function(e) {
+            // Close desktop user menu if clicking outside
+            var userMenu = $('#userMenuDropdown').parent();
+            if (userMenu.length && !userMenu[0].contains(e.target)) {
+                userMenu.find('.dropdown-menu').removeClass('show');
+                userMenu.find('.dropdown-toggle').attr('aria-expanded', 'false');
+                userMenu.find('.dropdown-arrow-icon').css('transform', 'rotate(0deg)');
+            }
+            
+            // Close notification dropdown if clicking outside
+            var notificationsMenu = $('#notificationsBell').parent();
+            if (notificationsMenu.length && !notificationsMenu[0].contains(e.target)) {
+                notificationsMenu.find('.dropdown-menu').removeClass('show');
+                notificationsMenu.find('.dropdown-toggle').attr('aria-expanded', 'false');
+            }
+
+            // Close categories dropdown if clicking outside
+            var categoriesMenu = $('#categoriesDropdown').parent();
+            if (categoriesMenu.length && !categoriesMenu[0].contains(e.target)) {
+                categoriesMenu.find('.dropdown-menu').removeClass('show');
+                categoriesMenu.find('.dropdown-toggle').attr('aria-expanded', 'false');
+            }
+        });
+
+        $(document).on('keydown.mythemeGlobal', function(e) {
+            if (e.key === 'Escape') {
+                $('.dropdown-menu.show').removeClass('show');
+                $('.dropdown-toggle[aria-expanded="true"]').attr('aria-expanded', 'false');
+                $('.dropdown-arrow-icon').css('transform', 'rotate(0deg)');
+            }
+        });
+    }
+
+    // ===== SEARCH MODAL =====
+    function initSearchModal() {
+        $('#searchButtonDesktop').on('click', function(e) {
+            e.preventDefault();
+            var modalElement = $('#searchModal');
+            if (modalElement.length) {
+                try {
+                    var modal = new bootstrap.Modal(modalElement[0]);
+                    modal.show();
+                } catch(e) {
+                    // Fallback to direct navigation
+                    window.location.href = $(this).attr('href');
+                }
+            } else {
+                // Direct navigation if modal doesn't exist
+                window.location.href = $(this).attr('href');
+            }
+        });
+        
+        $('#mobileSearchBtn').on('click', function(e) {
+            e.preventDefault();
+            closeMobileMenu('mobileMenuPanel', 'mobileMenuOverlay');
+            var modalElement = $('#searchModal');
+            if (modalElement.length) {
+                try {
+                    var modal = new bootstrap.Modal(modalElement[0]);
+                    modal.show();
+                } catch(e) {
+                    window.location.href = $(this).attr('href');
+                }
+            } else {
+                window.location.href = $(this).attr('href');
+            }
+        });
+    }
+    
+    // ===== NOTIFICATIONS =====
+    
+    // Notifications handled by Moodle default behavior via navbar_plugin_output
+    
+    // Notifications handled by Moodle default behavior
+    
+    // ===== MOBILE SUBMENU FOR CATEGORIES =====
+    function initMobileSubmenu() {
+        // Categories link handling - navigate directly without submenu
+        $('.mobile-menu-panel .nav-link[href*="course/index.php"]').on('click', function(e) {
+            // Let it navigate normally - no submenu needed for categories
+            closeMobileMenu('mobileMenuPanel', 'mobileMenuOverlay');
+        });
+        
+        $('#backToMainMenu').on('click', function(e) {
+            e.preventDefault();
+            $('#mobileSubmenuPanel').fadeOut(100);
+            $('#mobileMenuPanel').fadeIn(200);
+        });
+    }
+
+    // ===== MOBILE MENU FUNCTIONS =====
+    function openMobileMenu(panelId, overlayId) {
+        $('#' + panelId).fadeIn(200).addClass('open');
+        $('#' + overlayId).fadeIn(200).addClass('show');
+        $('body').addClass('mobile-menu-open');
+    }
+
+    function closeMobileMenu(panelId, overlayId) {
+        $('#' + panelId).fadeOut(200).removeClass('open');
+        $('#' + overlayId).fadeOut(200).removeClass('show');
+        $('body').removeClass('mobile-menu-open');
+        $('#mobileSubmenuPanel').fadeOut(100);
+    }
+
+    $('#mobileMenuToggle').on('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        openMobileMenu('mobileMenuPanel', 'mobileMenuOverlay');
+    });
+    
+    $('#closeMobileMenu, #mobileMenuOverlay').on('click', function() {
+        closeMobileMenu('mobileMenuPanel', 'mobileMenuOverlay');
+    });
+
+    $('#mobileMenuToggleGuest').on('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        openMobileMenu('mobileMenuPanelGuest', 'mobileMenuOverlayGuest');
+    });
+    
+    $('#closeMobileMenuGuest, #mobileMenuOverlayGuest').on('click', function() {
+        closeMobileMenu('mobileMenuPanelGuest', 'mobileMenuOverlayGuest');
+    });
+
+    $('.mobile-menu-panel .nav-link:not(#mobileSearchBtn):not(#mobileNotificationsBtn)').on('click', function() {
+        closeMobileMenu('mobileMenuPanel', 'mobileMenuOverlay');
+        closeMobileMenu('mobileMenuPanelGuest', 'mobileMenuOverlayGuest');
+    });
+
+    $(document).on('keydown', function(e) {
+        if (e.key === 'Escape') {
+            closeMobileMenu('mobileMenuPanel', 'mobileMenuOverlay');
+            closeMobileMenu('mobileMenuPanelGuest', 'mobileMenuOverlayGuest');
+            $('#mobileSubmenuPanel').fadeOut(100);
+        }
+    });
+
+    // ===== ACTIVE LINK HIGHLIGHTING =====
+    function setActiveLink() {
+        var currentPath = window.location.pathname;
+        $('.navbar-nav .nav-link, .mobile-menu-panel .nav-link').removeClass('active');
+        
+        $('.navbar-nav .nav-link, .mobile-menu-panel .nav-link').each(function() {
+            var href = $(this).attr('href');
+            if (href && href !== '#' && href !== '{{{ config.wwwroot }}}') {
+                if (currentPath === href || (href !== '/' && currentPath.indexOf(href) === 0)) {
+                    $(this).addClass('active');
+                }
+            } else if (href === '{{{ config.wwwroot }}}' && 
+                      (currentPath === '/' || currentPath === '' || currentPath.indexOf('/index.php') === 0)) {
+                $(this).addClass('active');
+            }
+        });
+    }
+
+    // ===== FIX DESKTOP DROPDOWN =====
+    function initDesktopDropdown() {
+        var dropdownToggle = document.getElementById('userMenuDropdown');
+        if (dropdownToggle) {
+            // Remove any existing Bootstrap dropdown instances to prevent conflicts
+            $(dropdownToggle).off('click.dropdown mouseenter.dropdown mouseleave.dropdown');
+            
+            // Ensure dropdown is closed on page load
+            var $menu = $(dropdownToggle).parent().find('.dropdown-menu');
+            $menu.removeClass('show');
+            $(dropdownToggle).attr('aria-expanded', 'false');
+            $(dropdownToggle).find('.dropdown-arrow-icon').css('transform', 'rotate(0deg)');
+            
+            $(dropdownToggle).on('click.dropdown', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                var $parent = $(this).parent();
+                var $menu = $parent.find('.dropdown-menu');
+                var $arrow = $(this).find('.dropdown-arrow-icon');
+                
+                if ($menu.hasClass('show')) {
+                    $menu.removeClass('show');
+                    $(this).attr('aria-expanded', 'false');
+                    $arrow.css('transform', 'rotate(0deg)');
+                } else {
+                    $('.dropdown-menu.show').removeClass('show');
+                    $('.dropdown-toggle[aria-expanded="true"]').attr('aria-expanded', 'false');
+                    $('.dropdown-arrow-icon').css('transform', 'rotate(0deg)');
+                    
+                    $menu.addClass('show');
+                    $(this).attr('aria-expanded', 'true');
+                    $arrow.css('transform', 'rotate(180deg)');
+                    
+                    // High z-index to stay above Moodle content
+                    $menu.css('z-index', '9999');
+                }
+            });
+
+            // Handle clicking outside to close
+            $(document).off('click.userMenuClose').on('click.userMenuClose', function(e) {
+                if (!$(dropdownToggle).parent().is(e.target) && $(dropdownToggle).parent().has(e.target).length === 0) {
+                    var $menu = $(dropdownToggle).parent().find('.dropdown-menu');
+                    if ($menu.hasClass('show')) {
+                        $menu.removeClass('show');
+                        $(dropdownToggle).attr('aria-expanded', 'false');
+                        $(dropdownToggle).find('.dropdown-arrow-icon').css('transform', 'rotate(0deg)');
+                    }
+                }
+            });
+            
+            // Prevent hover from opening dropdown
+            $(dropdownToggle).parent().off('mouseenter.dropdown mouseleave.dropdown');
+        }
+    }
+
+    // ===== CLOSE ALL DROPDOWNS ON PAGE LOAD =====
+    function closeAllDropdowns() {
+        $('.dropdown-menu').removeClass('show');
+        $('.dropdown-toggle').attr('aria-expanded', 'false');
+        $('.dropdown-arrow-icon').css('transform', 'rotate(0deg)');
+    }
+    
+    // ===== HANDLE ALL DROPDOWN CLICKS =====
+    function initAllDropdowns() {
+        // Remove ALL existing event handlers for dropdown toggles
+        $('.dropdown-toggle, [data-bs-toggle="dropdown"], [data-toggle="dropdown"]').off('click.dropdown mouseenter.dropdown mouseleave.dropdown hover.dropdown');
+        
+        // Add click handler to dropdown toggles only
+        $('.dropdown-toggle, [data-bs-toggle="dropdown"], [data-toggle="dropdown"]').on('click.dropdown', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            var $this = $(this);
+            var $parent = $this.parent();
+            var $menu = $parent.find('.dropdown-menu');
+            
+            // Close all other dropdowns first
+            $('.dropdown-menu').not($menu).removeClass('show');
+            $('.dropdown-toggle').not($this).attr('aria-expanded', 'false');
+            
+            // Toggle current dropdown
+            if ($menu.hasClass('show')) {
+                $menu.removeClass('show');
+                $this.attr('aria-expanded', 'false');
+                if ($this.find('.dropdown-arrow-icon').length) {
+                    $this.find('.dropdown-arrow-icon').css('transform', 'rotate(0deg)');
+                }
+            } else {
+                $menu.addClass('show');
+                $this.attr('aria-expanded', 'true');
+                
+                // If this is the notifications bell, let Moodle handle it or do nothing extra
+                if ($this.attr('id') === 'notificationsBell') {
+                    // Moodle default behavior
+                }
+
+                // Extra handling for categories dropdown
+                if ($this.attr('id') === 'categoriesDropdown') {
+                    $menu.addClass('show');
+                    $this.attr('aria-expanded', 'true');
+                }
+                
+                if ($this.find('.dropdown-arrow-icon').length) {
+                    $this.find('.dropdown-arrow-icon').css('transform', 'rotate(180deg)');
+                }
+            }
+        });
+        
+        // Prevent hover events on dropdown toggles
+        $('.dropdown, .dropdown-toggle, [data-bs-toggle="dropdown"], [data-toggle="dropdown"]').off('mouseenter.dropdown mouseleave.dropdown hover.dropdown');
+        $('.dropdown, .dropdown-toggle, [data-bs-toggle="dropdown"], [data-toggle="dropdown"]').on('mouseenter.dropdown mouseleave.dropdown hover.dropdown', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            return false;
+        });
+    }
+
+    // Function to hide edit mode button text globally and handle label clicks
+    function initMobileEditModeButton() {
+        // Find all edit mode buttons and hide their internal text non-destructively
+        setTimeout(function() {
+            var editContainers = $('.edit-mode-button-only, .edit-mode-container');
+            editContainers.each(function() {
+                var $container = $(this);
+                
+                // Remove text nodes from internal labels to hide "Edit mode" text 
+                // while keeping the label element for the switch UI
+                $container.find('label').contents().filter(function() {
+                    return this.nodeType === 3;
+                }).remove();
+                
+                // Ensure manual spans trigger the input
+                $container.find('> span').css('cursor', 'pointer').off('click').on('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    var $checkbox = $container.find('input[type="checkbox"]');
+                    if ($checkbox.length) {
+                        // Directly trigger the click on the checkbox
+                        $checkbox[0].click();
+                    }
+                });
+            });
+            
+            // For instances where Moodle might not have bound the event to the second toggle
+            // We can try to sync them if needed, but unique IDs usually solve it.
+        }, 300);
+    }
+
+    initMobileProfileDropdown();
+    initSearchModal();
+    initMobileSubmenu();
+    initMobileEditModeButton();
+    
+    // Close all dropdowns on page load
+    closeAllDropdowns();
+    
+    // Initialize all dropdowns
+    initAllDropdowns();
+    
+    // Small delay to ensure DOM is stable on complex pages like courses
+    setTimeout(function() {
+        initDesktopDropdown();
+        initGlobalDropdownClosers();
+        closeAllDropdowns(); // Ensure all are closed after init
+        initAllDropdowns(); // Re-initialize all dropdowns
+        initMobileEditModeButton(); // Re-run for edit mode button
+    }, 300);
+    setActiveLink();
+    
+    // Re-initialize dropdowns after page loads to ensure they work properly
+    $(document).on('page-loaded', function() {
+        setActiveLink();
+        initDesktopDropdown();
+        initMobileProfileDropdown();
+        closeAllDropdowns(); // Ensure all are closed on page load
+        initAllDropdowns(); // Re-initialize all dropdowns
+        initMobileEditModeButton();
+    });
+    
+    // Also re-initialize on DOM changes for dynamic content
+    $(document).ajaxComplete(function() {
+        setTimeout(function() {
+            initDesktopDropdown();
+            initAllDropdowns(); // Re-initialize all dropdowns
+            closeAllDropdowns(); // Close any that might have opened
+            initMobileEditModeButton();
+        }, 100);
+    });
+    
+    // Notification polling removed - handled by Moodle default behavior
+
+});
+{{/js}}
