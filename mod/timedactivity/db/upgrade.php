@@ -154,5 +154,41 @@ function xmldb_timedactivity_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2026043013, 'timedactivity');
     }
 
+    if ($oldversion < 2026051800) {
+        // Define field attempts to be added to timedactivity_tracking.
+        $table = new xmldb_table('timedactivity_tracking');
+        $field = new xmldb_field('attempts', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'videoposition');
+
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        upgrade_mod_savepoint(true, 2026051800, 'timedactivity');
+    }
+
+    if ($oldversion < 2026051801) {
+        // Define field allowedattempts to be added to timedactivity.
+        $table = new xmldb_table('timedactivity');
+        $field = new xmldb_field('allowedattempts', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'timelimitperquestion');
+
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        upgrade_mod_savepoint(true, 2026051801, 'timedactivity');
+    }
+
+    if ($oldversion < 2026051802) {
+        // Define field maxquizattempts to be added to timedactivity.
+        $table = new xmldb_table('timedactivity');
+        $field = new xmldb_field('maxquizattempts', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'allowedattempts');
+
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        upgrade_mod_savepoint(true, 2026051802, 'timedactivity');
+    }
+
     return true;
 }

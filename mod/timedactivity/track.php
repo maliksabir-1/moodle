@@ -4,7 +4,9 @@ require_once($CFG->libdir . '/completionlib.php');
 
 $cmid = required_param('cmid', PARAM_INT);
 $userid = required_param('userid', PARAM_INT);
-$duration = required_param('duration', PARAM_INT);
+$duration = optional_param('duration', 0, PARAM_INT);
+$position = optional_param('position', null, PARAM_FLOAT);
+$visitid = optional_param('visitid', 0, PARAM_INT);
 
 require_sesskey();
 
@@ -18,24 +20,42 @@ if (!$track) {
     $track->timedactivityid = $timedactivity->id;
     $track->userid = $userid;
     $track->totaltimespent = $duration;
+    if ($position !== null) {
+        $track->videoposition = (int)$position;
+    }
+    $track->attempts = 1;
     $track->timemodified = time();
     $track->id = $DB->insert_record('timedactivity_tracking', $track);
 } else {
     $track->totaltimespent += $duration;
+    if ($position !== null) {
+        $track->videoposition = (int)$position;
+    }
     $track->timemodified = time();
     $DB->update_record('timedactivity_tracking', $track);
 }
 
-// Check completion.
-$iscomplete = false;
-if ($timedactivity->requiredtime > 0 && $track->totaltimespent >= $timedactivity->requiredtime) {
-    $iscomplete = true;
-    
-    // Update Moodle completion state.
-    $completion = new completion_info(get_course($cm->course));
-    if ($completion->is_enabled($cm) && $cm->completion == COMPLETION_TRACKING_AUTOMATIC) {
-        $completion->update_state($cm, COMPLETION_COMPLETE, $userid);
+// Update visit session tracking.
+if ($visitid > 0) {
+    $visit = $DB->get_record('timedactivity_visits', array('id' => $visitid));
+    if ($visit) {
+        $visit->watchtime += $duration;
+        $visit->lastaccess = time();
+        $DB->update_record('timedactivity_visits', $visit);
     }
+}
+
+require_once($CFG->dirroot . '/mod/timedactivity/lib.php');
+
+// Trigger dynamic grade and completion re-evaluation for this user
+timedactivity_update_user_grade_and_completion($timedactivity, $userid);
+
+// Retrieve actual course module completion status
+$completion = new completion_info(get_course($cm->course));
+$iscomplete = false;
+if ($completion->is_enabled($cm)) {
+    $cm_data = $completion->get_data($cm, false, $userid);
+    $iscomplete = ($cm_data->completionstate == COMPLETION_COMPLETE);
 }
 
 echo json_encode(array(

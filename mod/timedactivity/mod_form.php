@@ -56,6 +56,11 @@ class mod_timedactivity_mod_form extends moodleform_mod {
         $mform->addHelpButton('quizdata', 'quizdata', 'mod_timedactivity');
         $mform->setDefault('quizdata', '[]');
 
+
+
+        $mform->addElement('checkbox', 'retakesallowed', get_string('retakesallowed', 'mod_timedactivity'));
+        $mform->setDefault('retakesallowed', 1);
+
         // Grade settings.
         $mform->addElement('header', 'gradesettings', get_string('gradesettings', 'mod_timedactivity'));
         $mform->addElement('select', 'grademethod', get_string('grademethod', 'mod_timedactivity'), array(
@@ -68,6 +73,15 @@ class mod_timedactivity_mod_form extends moodleform_mod {
         $mform->setType('passinggrade', PARAM_INT);
         $mform->setDefault('passinggrade', 70);
         $mform->addElement('checkbox', 'requiretimeforgrade', get_string('requiretimeforgrade', 'mod_timedactivity'));
+        
+        $attempts_options = [];
+        $attempts_options[0] = 'Unlimited';
+        for ($i = 1; $i <= 30; $i++) {
+            $attempts_options[$i] = $i . ($i === 1 ? ' Attempt' : ' Attempts');
+        }
+        $mform->addElement('select', 'allowedattempts', get_string('allowedattempts', 'mod_timedactivity'), $attempts_options);
+        $mform->addHelpButton('allowedattempts', 'allowedattempts', 'mod_timedactivity');
+        $mform->setDefault('allowedattempts', 1);
 
         // Standard CM elements.
         $this->standard_coursemodule_elements();
