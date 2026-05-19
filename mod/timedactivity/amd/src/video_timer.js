@@ -8,6 +8,9 @@ define(['jquery', 'core/ajax', 'core/str', 'core/notification'], function($, Aja
         intervalId: null,
         popupShown: {},
         timeSpent: 0,
+        seekingPreventionEnabled: true,
+        lastCheckedTime: 0,
+        seekCount: 0,
 
         init: function(config) {
             this.config = config;
@@ -16,6 +19,8 @@ define(['jquery', 'core/ajax', 'core/str', 'core/notification'], function($, Aja
             this.quizAnswered = config.quizAnswered || 0;
             this.totalQuizzes = config.totalQuizzes || 0;
             this.popupShown = {};
+            this.seekingPreventionEnabled = config.preventSeeking !== false;
+            this.lastCheckedTime = config.savedPosition || 0;
             
             var self = this;
             
@@ -106,7 +111,10 @@ define(['jquery', 'core/ajax', 'core/str', 'core/notification'], function($, Aja
                 playerVars: {
                     'controls': 1,
                     'enablejsapi': 1,
-                    'origin': window.location.origin
+                    'origin': window.location.origin,
+                    'disablekb': 1,  // Disable keyboard controls
+                    'fs': 0,  // Disable fullscreen (which can allow seeking)
+                    'modestbranding': 1
                 },
                 events: {
                     'onReady': function(event) {
@@ -139,19 +147,38 @@ define(['jquery', 'core/ajax', 'core/str', 'core/notification'], function($, Aja
             this.checkInterval = setInterval(function() {
                 if (self.isPlaying && self.player && typeof self.player.getCurrentTime === 'function') {
                     var currentTime = self.player.getCurrentTime();
-                    if (currentTime > self.lastKnownTime + 1) {
-                        // Prevent seeking forward beyond saved position
-                        self.player.seekTo(self.lastKnownTime);
+                    
+                    // Prevent seeking forward
+                    if (self.seekingPreventionEnabled) {
+                        if (currentTime > self.lastKnownTime + 1.5) {
+                            // User tried to skip forward - force back
+                            self.player.seekTo(self.lastKnownTime);
+                            self.showSeekWarning();
+                            self.seekCount++;
+                        } else if (currentTime < self.lastKnownTime - 0.5) {
+                            // User tried to go backward - force forward
+                            self.player.seekTo(self.lastKnownTime);
+                            self.showSeekWarning();
+                            self.seekCount++;
+                        } else {
+                            self.lastKnownTime = currentTime;
+                        }
                     } else {
                         self.lastKnownTime = currentTime;
                     }
                     self.checkQuizzes(currentTime);
                 }
-            }, 500);
+            }, 200); // Check more frequently
         },
 
         attachLocalEvents: function() {
             var self = this;
+            
+            // Remove native controls to prevent seeking
+            if (this.seekingPreventionEnabled) {
+                this.player.controls = false;
+                this.addCustomControls();
+            }
             
             this.player.addEventListener('play', function() { 
                 self.isPlaying = true; 
@@ -167,23 +194,123 @@ define(['jquery', 'core/ajax', 'core/str', 'core/notification'], function($, Aja
                 self.savePosition();
             });
             
+            // Enhanced seeking prevention for local video
             this.player.addEventListener('seeking', function() {
-                if (Math.abs(self.player.currentTime - self.lastKnownTime) > 1) {
-                    self.player.currentTime = self.lastKnownTime;
+                if (self.seekingPreventionEnabled) {
+                    var attemptedTime = self.player.currentTime;
+                    var expectedTime = self.lastKnownTime;
+                    
+                    // If trying to seek away from current position
+                    if (Math.abs(attemptedTime - expectedTime) > 0.5) {
+                        // Force back to expected position
+                        self.player.currentTime = expectedTime;
+                        self.showSeekWarning();
+                        self.seekCount++;
+                        
+                        // If too many seeks, pause video as penalty
+                        if (self.seekCount > 5) {
+                            self.player.pause();
+                            alert('Warning: Please watch the video without skipping. The video has been paused.');
+                            setTimeout(function() {
+                                self.seekCount = 0;
+                            }, 30000);
+                        }
+                    }
                 }
             });
             
+            // Monitor timeupdate for additional prevention
             this.player.addEventListener('timeupdate', function() {
-                if (Math.abs(self.player.currentTime - self.lastKnownTime) <= 1) {
-                    self.lastKnownTime = self.player.currentTime;
+                if (self.seekingPreventionEnabled) {
+                    var currentTime = self.player.currentTime;
+                    
+                    // Check for forward jumps
+                    if (currentTime > self.lastKnownTime + 1) {
+                        self.player.currentTime = self.lastKnownTime;
+                        self.showSeekWarning();
+                    } 
+                    // Check for backward jumps
+                    else if (currentTime < self.lastKnownTime - 0.5) {
+                        self.player.currentTime = self.lastKnownTime;
+                        self.showSeekWarning();
+                    }
+                    else if (Math.abs(self.player.currentTime - self.lastKnownTime) <= 1) {
+                        self.lastKnownTime = self.player.currentTime;
+                    }
+                } else {
+                    if (Math.abs(self.player.currentTime - self.lastKnownTime) <= 1) {
+                        self.lastKnownTime = self.player.currentTime;
+                    }
                 }
                 self.checkQuizzes(self.player.currentTime);
+            });
+            
+            // Disable right-click on video (which might show save/download options)
+            this.player.addEventListener('contextmenu', function(e) {
+                if (self.seekingPreventionEnabled) {
+                    e.preventDefault();
+                    return false;
+                }
             });
             
             if (this.config.matchDuration) {
                 this.player.addEventListener('loadedmetadata', function() { 
                     self.sendDuration(self.player.duration); 
                 });
+            }
+        },
+        
+        // Add custom controls that only allow play/pause, no seeking
+        addCustomControls: function() {
+            var self = this;
+            var container = $('#video-player');
+            
+            // Check if custom controls already exist
+            if ($('#custom-video-controls').length) {
+                return;
+            }
+            
+            var controlsHtml = '<div id="custom-video-controls" style="display: flex; justify-content: center; gap: 10px; margin-top: 10px;">' +
+                              '<button id="custom-play-pause" class="btn btn-primary">▶ Play</button>' +
+                              '<span id="video-time-display" style="line-height: 38px; margin-left: 15px; color: #fff;">0:00 / 0:00</span>' +
+                              '</div>';
+            
+            container.after(controlsHtml);
+            
+            $('#custom-play-pause').on('click', function() {
+                if (self.player.paused) {
+                    self.player.play();
+                    $(this).text('⏸ Pause');
+                } else {
+                    self.player.pause();
+                    $(this).text('▶ Play');
+                }
+            });
+            
+            // Update time display
+            self.player.addEventListener('timeupdate', function() {
+                var current = self.formatTimeSimple(self.player.currentTime);
+                var duration = self.formatTimeSimple(self.player.duration || 0);
+                $('#video-time-display').text(current + ' / ' + duration);
+            });
+        },
+        
+        formatTimeSimple: function(seconds) {
+            var mins = Math.floor(seconds / 60);
+            var secs = Math.floor(seconds % 60);
+            return mins + ':' + (secs < 10 ? '0' : '') + secs;
+        },
+        
+        showSeekWarning: function() {
+            // Only show warning every few seeks to avoid annoying the user
+            if (this.seekCount % 3 === 0 && this.seekCount > 0) {
+                var warning = $('#seek-warning');
+                if (!warning.length) {
+                    $('body').append('<div id="seek-warning" style="position:fixed; top:20px; left:50%; transform:translateX(-50%); background:#dc3545; color:white; padding:10px 20px; border-radius:5px; z-index:10000; display:none;">⚠️ Please watch the video without skipping!</div>');
+                    warning = $('#seek-warning');
+                }
+                
+                warning.show().fadeOut(2000);
             }
         },
 
@@ -277,6 +404,31 @@ define(['jquery', 'core/ajax', 'core/str', 'core/notification'], function($, Aja
                         'color': color
                     });
             }
+            
+            // Also update the grade display in the quiz results section
+            this.updateGradeDisplayInResults(grade, passed);
+        },
+        
+        updateGradeDisplayInResults: function(grade, passed) {
+            if ($('#current-grade').length) {
+                $('#current-grade').text(grade + '%');
+                var $gradeHeading = $('#grade-heading');
+                if (passed) {
+                    $gradeHeading.removeClass('text-danger').addClass('text-success');
+                } else {
+                    $gradeHeading.removeClass('text-success').addClass('text-danger');
+                }
+            }
+            if ($('#grade-status').length) {
+                var passingGrade = parseInt(this.config.passingGrade || 40, 10);
+                var status = (grade >= passingGrade) ? '✅ PASSING' : '❌ NOT PASSING';
+                $('#grade-status').html(status);
+                if (grade >= passingGrade) {
+                    $('#grade-status').removeClass('text-danger').addClass('text-success');
+                } else {
+                    $('#grade-status').removeClass('text-success').addClass('text-danger');
+                }
+            }
         },
 
         formatTime: function(secs) {
@@ -330,6 +482,9 @@ define(['jquery', 'core/ajax', 'core/str', 'core/notification'], function($, Aja
                 if (typeof this.player.pause === 'function') {
                     try {
                         this.player.pause();
+                        if ($('#custom-play-pause').length) {
+                            $('#custom-play-pause').text('▶ Play');
+                        }
                     } catch (e) {
                         console.error('Error pausing local video:', e);
                     }
@@ -348,6 +503,9 @@ define(['jquery', 'core/ajax', 'core/str', 'core/notification'], function($, Aja
                 if (typeof this.player.play === 'function') {
                     try {
                         this.player.play();
+                        if ($('#custom-play-pause').length) {
+                            $('#custom-play-pause').text('⏸ Pause');
+                        }
                     } catch (e) {
                         console.error('Error playing local video:', e);
                     }
@@ -455,8 +613,9 @@ define(['jquery', 'core/ajax', 'core/str', 'core/notification'], function($, Aja
 
             var timerInterval = null;
             var limit = parseInt(this.config.timelimitperquestion, 10);
+            var timeLeft = limit;
+            
             if (!isNaN(limit) && limit > 0) {
-                var timeLeft = limit;
                 timerInterval = setInterval(function() {
                     timeLeft--;
                     $('#quiz-timer-' + q.id).text('Time remaining: ' + timeLeft + 's');
@@ -467,6 +626,8 @@ define(['jquery', 'core/ajax', 'core/str', 'core/notification'], function($, Aja
                 }, 1000);
             }
 
+            var self = this;
+            
             function handleAnswerSubmission(selectedAnswer, isTimeUp) {
                 if (timerInterval) {
                     clearInterval(timerInterval);
@@ -492,7 +653,7 @@ define(['jquery', 'core/ajax', 'core/str', 'core/notification'], function($, Aja
                 var feedbackHtml = '<div class="alert ' + alertClass + ' mt-3" style="padding: 15px; border-radius: 6px; font-size: 1.05em; line-height: 1.4; border: none; font-weight: 500;">' +
                                    '<div style="font-weight: bold; margin-bottom: 5px; font-size: 1.1em;">' + icon + ' ' + titleText + '</div>';
                 
-                if (!isCorrect) {
+                if (!isCorrect && !isTimeUp) {
                     var correctText = options[q.correctanswer] || '';
                     feedbackHtml += '<div style="margin-bottom: 5px;"><strong>Correct answer:</strong> ' + correctText + '</div>';
                 }
@@ -501,21 +662,71 @@ define(['jquery', 'core/ajax', 'core/str', 'core/notification'], function($, Aja
                     feedbackHtml += '<div style="font-size: 0.95em; color: #495057; margin-top: 5px; padding-top: 5px; border-top: 1px solid rgba(0,0,0,0.08); font-style: italic;">' + q.explanation + '</div>';
                 }
                 
+                // Add retry button if retakes are allowed
+                if (self.config.retakesallowed && (!isCorrect || isTimeUp)) {
+                    feedbackHtml += '<div class="mt-3 text-center">' +
+                                   '<button type="button" class="btn btn-info retry-quiz-btn mr-2">Try Again</button>' +
+                                   '<button type="button" class="btn btn-secondary close-quiz-btn">Close</button>' +
+                                   '</div>';
+                } else {
+                    feedbackHtml += '<div class="mt-3 text-center">' +
+                                   '<button type="button" class="btn btn-secondary close-quiz-btn">Close</button>' +
+                                   '</div>';
+                }
+                
                 feedbackHtml += '</div>';
                 
                 // Append feedback right in the custom modal body
                 $modal.find('.timedactivity-custom-body').append(feedbackHtml);
                 
-                // Save answer in Moodle DB
-                self.submitQuizAnswer(q, selectedAnswer, options);
+                // Save answer in Moodle DB with callback to update UI
+                self.submitQuizAnswer(q, selectedAnswer, options, function(response) {
+                    if (response && response.grade !== undefined) {
+                        self.updateGradeRequirementDisplay(response.grade, response.passed);
+                    }
+                    self.refreshQuizResultsTable();
+                });
                 
-                // Automatically close and resume after 3.5 seconds
-                setTimeout(function() {
+                // Handle retry button
+                $modal.find('.retry-quiz-btn').off('click').on('click', function() {
+                    $modal.find('.timedactivity-custom-body .alert').remove();
+                    $modal.find('input[name="answer"]').prop('disabled', false);
+                    $modal.find('.submit-answer').prop('disabled', false);
+                    $modal.find('.cancel-quiz').prop('disabled', false);
+                    $modal.find('input[name="answer"]').prop('checked', false);
+                    
+                    if (limit > 0 && !isTimeUp) {
+                        if (timerInterval) clearInterval(timerInterval);
+                        timeLeft = limit;
+                        timerInterval = setInterval(function() {
+                            timeLeft--;
+                            $('#quiz-timer-' + q.id).text('Time remaining: ' + timeLeft + 's');
+                            if (timeLeft <= 0) {
+                                clearInterval(timerInterval);
+                                handleAnswerSubmission(-1, true);
+                            }
+                        }, 1000);
+                    }
+                });
+                
+                // Handle close button
+                $modal.find('.close-quiz-btn').off('click').on('click', function() {
                     $modal.fadeOut(300, function() {
                         $(this).remove();
                         self.resumeVideo();
                     });
-                }, 3500);
+                });
+                
+                var autoCloseTimeout = setTimeout(function() {
+                    $modal.fadeOut(300, function() {
+                        $(this).remove();
+                        self.resumeVideo();
+                    });
+                }, 5000);
+                
+                $modal.find('.retry-quiz-btn, .close-quiz-btn').on('click', function() {
+                    clearTimeout(autoCloseTimeout);
+                });
             }
             
             $modal.find('.submit-answer').off('click').on('click', function() {
@@ -527,7 +738,6 @@ define(['jquery', 'core/ajax', 'core/str', 'core/notification'], function($, Aja
                 }
             });
 
-            // Make clicking on the custom option row select the radio button
             $modal.find('.radio').off('click').on('click', function(e) {
                 if (e.target.tagName !== 'INPUT') {
                     var $radio = $(this).find('input[type="radio"]');
@@ -588,7 +798,7 @@ define(['jquery', 'core/ajax', 'core/str', 'core/notification'], function($, Aja
                    '</div>';
         },
 
-        submitQuizAnswer: function(q, answer, options) {
+        submitQuizAnswer: function(q, answer, options, callback) {
             var self = this;
             var isCorrect = (answer === q.correctanswer);
             
@@ -605,6 +815,9 @@ define(['jquery', 'core/ajax', 'core/str', 'core/notification'], function($, Aja
                         if (response.grade !== undefined && response.grade !== null) {
                             self.updateGradeRequirementDisplay(response.grade, response.passed);
                         }
+                        if (typeof callback === 'function') {
+                            callback(response);
+                        }
                     }
                 },
                 fail: function(error) {
@@ -612,12 +825,91 @@ define(['jquery', 'core/ajax', 'core/str', 'core/notification'], function($, Aja
                 }
             }]);
         },
+        
+        refreshQuizResultsTable: function() {
+            var self = this;
+            
+            $.ajax({
+                url: this.config.ajaxUrl.replace('track.php', 'get_quiz_results.php'),
+                type: 'POST',
+                data: {
+                    cmid: this.config.cmid,
+                    userid: this.config.userid,
+                    sesskey: this.config.sesskey
+                },
+                dataType: 'json',
+                success: function(response) {
+                    if (response.success) {
+                        self.quizAnswered = response.quiz_answered;
+                        self.updateQuizRequirementsDisplay();
+                        
+                        if (response.grade !== null) {
+                            self.updateGradeRequirementDisplay(response.grade, response.passed);
+                        }
+                        
+                        self.updateResultsTable(response.quiz_results);
+                    }
+                },
+                error: function() {
+                    console.error('Failed to refresh quiz results');
+                }
+            });
+        },
+        
+        updateResultsTable: function(quizResults) {
+            var $table = $('#quiz-results-table');
+            if (!$table.length || !quizResults) {
+                return;
+            }
+            
+            var $tbody = $table.find('tbody');
+            if (!$tbody.length) {
+                return;
+            }
+            
+            $tbody.empty();
+            
+            var questionNum = 1;
+            for (var i = 0; i < quizResults.length; i++) {
+                var result = quizResults[i];
+                var options = result.options;
+                var userAnswerText = (result.useranswer >= 0 && options[result.useranswer]) 
+                    ? options[result.useranswer] 
+                    : (result.useranswer == -1 ? 'Not answered' : 'Invalid');
+                
+                var correctText = result.iscorrect ? '✓ Correct' : '✗ Incorrect';
+                var correctClass = result.iscorrect ? 'text-success' : 'text-danger';
+                
+                var row = '<tr>' +
+                           '<td>' + questionNum++ + '</td>' +
+                           '<td>' + this.escapeHtml(result.questiontext) + '</td>' +
+                           '<td>' + this.escapeHtml(userAnswerText) + '</td>' +
+                           '<td><span class="' + correctClass + '" style="font-weight:bold;">' + correctText + '</span></td>' +
+                         '</tr>';
+                $tbody.append(row);
+            }
+        },
+        
+        escapeHtml: function(text) {
+            if (!text) return '';
+            var map = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            };
+            return String(text).replace(/[&<>"']/g, function(m) { return map[m]; });
+        },
 
         resumeVideo: function() {
             if (this.player) {
                 if (typeof this.player.play === 'function') {
                     try {
                         this.player.play();
+                        if ($('#custom-play-pause').length) {
+                            $('#custom-play-pause').text('⏸ Pause');
+                        }
                     } catch (e) {
                         console.error('Error playing local video:', e);
                     }

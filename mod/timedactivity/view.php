@@ -83,7 +83,11 @@ $quizquestions = $DB->get_records('timedactivity_quiz', array('timedactivityid' 
 $quizdata = array();
 foreach ($quizquestions as $q) {
     // Check if user already answered this question correctly, if so, skip it
-    $answered_correctly = $DB->get_record('timedactivity_quiz_attempts', array('quizid' => $q->id, 'userid' => $userid, 'iscorrect' => 1));
+    $correct_attempts = $DB->get_records('timedactivity_quiz_attempts', 
+        array('quizid' => $q->id, 'userid' => $userid, 'iscorrect' => 1), 
+        'id DESC', '*', 0, 1);
+    $answered_correctly = !empty($correct_attempts);
+    
     if ($answered_correctly && empty($timedactivity->retakesallowed)) {
         continue;
     }
@@ -108,14 +112,20 @@ foreach ($quizquestions as $q) {
 $js_quiz_answered = 0;
 $answered_quiz_ids = array();
 foreach ($quizquestions as $qq) {
-    $correct = $DB->get_record('timedactivity_quiz_attempts', ['quizid' => $qq->id, 'userid' => $userid, 'iscorrect' => 1]);
+    $correct_attempts = $DB->get_records('timedactivity_quiz_attempts', 
+        array('quizid' => $qq->id, 'userid' => $userid, 'iscorrect' => 1), 
+        'id DESC', '*', 0, 1);
+    $correct = !empty($correct_attempts);
+    
     if ($correct) {
         $js_quiz_answered++;
         $answered_quiz_ids[] = (int)$qq->id;
     } else {
         // Check if user has made any attempt (even incorrect) so they don't get duplicate popups
-        $any_attempt = $DB->get_record('timedactivity_quiz_attempts', ['quizid' => $qq->id, 'userid' => $userid]);
-        if ($any_attempt) {
+        $any_attempt = $DB->get_records('timedactivity_quiz_attempts', 
+            array('quizid' => $qq->id, 'userid' => $userid), 
+            'id DESC', '*', 0, 1);
+        if (!empty($any_attempt)) {
             $answered_quiz_ids[] = (int)$qq->id;
         }
     }
@@ -142,7 +152,9 @@ $js_params = array(
     'quizAnswered' => $js_quiz_answered,
     'totalQuizzes' => $js_total_quizzes,
     'answeredQuizIds' => $answered_quiz_ids,
-    'passingGrade' => (int)($timedactivity->passinggrade ?? 70)
+    'passingGrade' => (int)($timedactivity->passinggrade ?? 70),
+    'retakesallowed' => !empty($timedactivity->retakesallowed),
+     'preventSeeking' => true  // Add this line to enable seeking prevention
 );
 
 $PAGE->set_url('/mod/timedactivity/view.php', array('id' => $cm->id));
@@ -199,8 +211,10 @@ if ($has_requirements) {
 
     $quiz_answered = 0;
     foreach ($quizquestions as $qq) {
-        $correct = $DB->get_record('timedactivity_quiz_attempts', ['quizid' => $qq->id, 'userid' => $userid, 'iscorrect' => 1]);
-        if ($correct) $quiz_answered++;
+        $correct_attempts = $DB->get_records('timedactivity_quiz_attempts', 
+            array('quizid' => $qq->id, 'userid' => $userid, 'iscorrect' => 1), 
+            'id DESC', '*', 0, 1);
+        if (!empty($correct_attempts)) $quiz_answered++;
     }
     $total_q     = count($quizquestions);
     $quizzes_met = $total_q > 0 && ($quiz_answered >= $total_q);
@@ -275,23 +289,220 @@ if ($has_requirements) {
     echo html_writer::end_div(); // card
 }
 
-// Display report links for teachers and administrators
-// if (has_capability('mod/timedactivity:viewreports', $context)) {
-//     echo html_writer::start_div('admin-actions alert alert-warning text-center mt-3', ['style' => 'background-color: #856404; border-color: #ffeeba; color: #ffffff;']);
+// After the video-container div - Quiz Results & Grade Section
+if ($timedactivity->grademethod > 0) {
+    echo html_writer::start_div('grade-report card mt-4', ['style' => 'border-radius:10px; border:1px solid #dee2e6; background:#fff;']);
+    echo html_writer::start_div('card-header', ['style' => 'background:#f8f9fa; border-bottom:1px solid #dee2e6; padding:12px 20px; display: flex; justify-content: space-between; align-items: center;']);
+    echo html_writer::tag('h5', '📊 Your Quiz Results & Grade', ['style' => 'margin:0; font-weight:700; color:#495057;']);
     
-//     $icon = $OUTPUT->pix_icon('icon', '', 'mod_timedactivity', ['class' => 'activityicon mr-2', 'style' => 'width:20px; height:20px; vertical-align:middle; filter: brightness(0) invert(1);']);
-//     echo html_writer::tag('h5', $icon . ' Teacher / Administrator Options', ['class' => 'font-weight-bold mb-3 d-flex align-items-center justify-content-center', 'style' => 'color: #ffffff;']);
+    // Add toggle button
+    echo html_writer::tag('button', 'Show Details', [
+        'id' => 'toggle-quiz-results-btn',
+        'class' => 'btn btn-sm btn-primary',
+        'style' => 'font-weight:500;',
+        'onclick' => 'toggleQuizResults()'
+    ]);
     
-//     echo html_writer::start_div('actions-wrapper');
-//     echo html_writer::link(
-//         new moodle_url('/mod/timedactivity/report.php', ['id' => $cm->id]),
-//         '📊 View Activity Completion Report',
-//         ['class' => 'btn btn-light d-inline-flex align-items-center font-weight-bold p-2 px-3', 'style' => 'color: #856404; background-color: #ffffff; border: none;']
-//     );
-//     echo html_writer::end_div();
+    echo html_writer::end_div();
     
-//     echo html_writer::end_div();
-// }
+    echo html_writer::start_div('card-body', ['id' => 'quiz-results-body', 'style' => 'padding:20px; display: none;']);
+    
+    // Get user's quiz results
+    require_once($CFG->dirroot . '/mod/timedactivity/locallib.php');
+    $quiz_results = timedactivity_get_user_quiz_results($timedactivity, $userid);
+    $user_grade = timedactivity_get_user_grade($timedactivity, $userid);
+    $passing_grade = (int)$timedactivity->passinggrade;
+    
+    if (!empty($quiz_results)) {
+        $grade_class = ($user_grade !== null && $user_grade >= $passing_grade) ? 'text-success' : 'text-danger';
+        
+        echo html_writer::start_div('grade-summary mb-4', ['style' => 'background:#f0f7ff; border-left:4px solid #007bff; padding:15px; border-radius:8px;']);
+        echo html_writer::tag('h3', 'Current Grade: <span id="current-grade">' . ($user_grade !== null ? $user_grade . '%' : 'Not graded yet') . '</span>', 
+            ['class' => $grade_class, 'style' => 'margin:0 0 10px 0;', 'id' => 'grade-heading']);
+        if ($timedactivity->passinggrade > 0) {
+            $status = ($user_grade !== null && $user_grade >= $passing_grade) ? '✅ PASSING' : '❌ NOT PASSING';
+            $status_class = ($user_grade !== null && $user_grade >= $passing_grade) ? 'text-success' : 'text-danger';
+            echo html_writer::tag('p', "Required Passing Grade: {$passing_grade}% - <span id='grade-status' class='{$status_class}'>{$status}</span>", 
+                ['style' => 'margin:0; font-weight:500;']);
+        }
+        echo html_writer::end_div();
+        
+        // Build grade table with ID for dynamic updates
+        echo '<table id="quiz-results-table" class="generaltable table table-striped table-hover" width="100%">
+                <thead>
+                    <tr><th>#</th><th>Question</th><th>Your Answer</th><th>Correct?</th></tr>
+                </thead>
+                <tbody>';
+        
+        $question_num = 1;
+        foreach ($quiz_results as $result) {
+            $options = $result->options;
+            $user_answer_text = ($result->useranswer >= 0 && isset($options[$result->useranswer])) 
+                ? $options[$result->useranswer] 
+                : ($result->useranswer == -1 ? 'Not answered' : 'Invalid');
+            
+            $correct_text = $result->iscorrect ? '✓ Correct' : '✗ Incorrect';
+            $correct_class = $result->iscorrect ? 'text-success' : 'text-danger';
+            
+            echo '<tr>
+                    <td>' . $question_num++ . '</td>
+                    <td>' . htmlspecialchars($result->questiontext) . '</td>
+                    <td>' . htmlspecialchars($user_answer_text) . '</td>
+                    <td><span class="' . $correct_class . '" style="font-weight:bold;">' . $correct_text . '</span></td>
+                  </tr>';
+        }
+        
+        echo '</tbody>
+            </table>';
+        
+        // Add retake all quizzes button if retakes allowed
+        if (!empty($timedactivity->retakesallowed)) {
+            echo html_writer::start_div('text-center mt-4');
+            echo html_writer::tag('button', '🔄 Retake All Quizzes', [
+                'id' => 'retake-all-quizzes-btn',
+                'class' => 'btn btn-warning btn-lg',
+                'style' => 'font-weight:bold;',
+                'onclick' => 'retakeAllQuizzes()'
+            ]);
+            echo html_writer::end_div();
+        }
+        
+    } else {
+        echo html_writer::tag('p', 'No quizzes available for this activity.', ['class' => 'text-muted text-center']);
+    }
+    
+    echo html_writer::end_div();
+    echo html_writer::end_div();
+}
+
+/// Add JavaScript for toggle and retake functionality
+echo html_writer::start_tag('script');
+echo '
+// Ensure jQuery is loaded before executing
+(function() {
+    // Function to check if jQuery is ready
+    function executeWhenReady() {
+        if (typeof jQuery !== "undefined") {
+            // jQuery is loaded, initialize functionality
+            initQuizFunctions();
+        } else {
+            // Wait a bit and try again
+            setTimeout(executeWhenReady, 100);
+        }
+    }
+    
+    function initQuizFunctions() {
+        var $ = jQuery;
+        
+        // Toggle Quiz Results Function
+        window.toggleQuizResults = function() {
+            var body = document.getElementById("quiz-results-body");
+            var btn = document.getElementById("toggle-quiz-results-btn");
+            
+            if (body && btn) {
+                if (body.style.display === "none" || body.style.display === "") {
+                    body.style.display = "block";
+                    btn.innerHTML = "Hide Details";
+                    btn.className = "btn btn-sm btn-secondary";
+                } else {
+                    body.style.display = "none";
+                    btn.innerHTML = "Show Details";
+                    btn.className = "btn btn-sm btn-primary";
+                }
+            }
+        };
+        
+        // Retake All Quizzes Function
+        window.retakeAllQuizzes = function() {
+            if (!confirm("Are you sure you want to retake all quizzes? Your previous answers will be reset.")) {
+                return false;
+            }
+            
+            // Disable the button to prevent multiple clicks
+            var retakeBtn = document.getElementById("retake-all-quizzes-btn");
+            var originalText = "";
+            if (retakeBtn) {
+                originalText = retakeBtn.innerHTML;
+                retakeBtn.disabled = true;
+                retakeBtn.innerHTML = "⏳ Processing...";
+            }
+            
+            // Get Moodle session key from page
+            var sesskey = "' . sesskey() . '";
+            var cmid = ' . $cm->id . ';
+            
+            // Make AJAX request using Moodle\'s core/ajax or jQuery
+            $.ajax({
+                url: M.cfg.wwwroot + "/mod/timedactivity/retake_all_quizzes.php",
+                type: "POST",
+                data: {
+                    cmid: cmid,
+                    sesskey: sesskey
+                },
+                dataType: "json",
+                success: function(response) {
+                    if (response && response.success) {
+                        // Show success message
+                        var $notification = $(\'<div class="alert alert-success alert-dismissible fade show" style="position:fixed; top:20px; right:20px; z-index:9999; padding:15px; border-radius:5px; box-shadow:0 2px 10px rgba(0,0,0,0.2);">\n\' +
+                            \'<strong>✓ Success!</strong> Quizzes reset successfully! Refreshing page...\n\' +
+                            \'</div>\');
+                        $("body").append($notification);
+                        setTimeout(function() {
+                            location.reload();
+                        }, 1500);
+                    } else {
+                        var errorMsg = response && response.error ? response.error : "Unknown error";
+                        alert("Failed to reset quizzes: " + errorMsg);
+                        if (retakeBtn) {
+                            retakeBtn.disabled = false;
+                            retakeBtn.innerHTML = originalText;
+                        }
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error("AJAX Error - Status:", status, "Error:", error);
+                    console.error("Response Text:", xhr.responseText);
+                    alert("An error occurred while resetting quizzes. Please refresh the page and try again.");
+                    if (retakeBtn) {
+                        retakeBtn.disabled = false;
+                        retakeBtn.innerHTML = originalText;
+                    }
+                }
+            });
+            
+            return false;
+        };
+        
+        // Store grade and passing grade for JS updates
+        window.userGrade = ' . ($user_grade !== null ? $user_grade : 'null') . ';
+        window.passingGrade = ' . (int)$timedactivity->passinggrade . ';
+        
+        // Attach event handler to retake button
+        var retakeBtn = document.getElementById("retake-all-quizzes-btn");
+        if (retakeBtn) {
+            // Remove any existing event listeners
+            var newBtn = retakeBtn.cloneNode(true);
+            retakeBtn.parentNode.replaceChild(newBtn, retakeBtn);
+            newBtn.onclick = function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                window.retakeAllQuizzes();
+                return false;
+            };
+        }
+        
+        console.log("Quiz functionality initialized successfully");
+    }
+    
+    // Start the initialization process
+    if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", executeWhenReady);
+    } else {
+        executeWhenReady();
+    }
+})();
+';
+echo html_writer::end_tag('script');
 
 echo $OUTPUT->footer();
 ?>
