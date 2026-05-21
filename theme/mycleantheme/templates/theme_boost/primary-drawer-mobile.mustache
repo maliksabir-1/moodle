@@ -98,10 +98,14 @@
                 </a>
                 {{/haschildren}}
             {{/mobileprimarynav}}
+            <!-- All courses Link -->
+            <a href="{{{ config.wwwroot }}}/course/index.php" class="list-group-item list-group-item-action" title="All courses">
+                All courses
+            </a>
             <!-- Categories Link - Added Here (After mobileprimarynav) -->
-<a href="{{{ config.wwwroot }}}/course/index.php" class="list-group-item list-group-item-action" title="Course categories">
-    Categories
-</a>
+            <a href="{{{ config.wwwroot }}}/course/index.php" class="list-group-item list-group-item-action" title="Course categories">
+                Categories
+            </a>
         </div>
     {{/drawercontent}}
     {{$drawerstate}}show-drawer-primary{{/drawerstate}}

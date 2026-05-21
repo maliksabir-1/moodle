@@ -1,0 +1,253 @@
+<div class="container py-4">
+
+    <!-- Course Controls Bar (Matches standard Moodle My Overview) -->
+    <div class="d-flex flex-wrap align-items-center gap-2 mb-4 pb-3 border-bottom" id="course-controls">
+        
+        <!-- Filter dropdown -->
+        <div class="dropdown">
+            <button class="btn btn-outline-secondary dropdown-toggle bg-white text-dark border" type="button" id="filterDropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                All
+            </button>
+            <ul class="dropdown-menu shadow-sm" aria-labelledby="filterDropdown">
+                <li><a class="dropdown-item active" href="#">All</a></li>
+                <li><a class="dropdown-item" href="#">In progress</a></li>
+                <li><a class="dropdown-item" href="#">Future</a></li>
+                <li><a class="dropdown-item" href="#">Past</a></li>
+            </ul>
+        </div>
+        
+        <!-- Search input -->
+        <div class="flex-grow-1 position-relative" style="min-width: 200px;">
+            <input type="text" class="form-control" id="courseSearchInput" placeholder="Search">
+        </div>
+        
+        <!-- Sort dropdown -->
+        <div class="dropdown">
+            <button class="btn btn-outline-secondary dropdown-toggle bg-white text-dark border" type="button" id="sortDropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Sort by course name
+            </button>
+            <ul class="dropdown-menu shadow-sm" aria-labelledby="sortDropdown">
+                <li><a class="dropdown-item active" href="#">Sort by course name</a></li>
+                <li><a class="dropdown-item" href="#">Sort by last accessed</a></li>
+            </ul>
+        </div>
+        
+        <!-- View dropdown -->
+        <div class="dropdown">
+            <button class="btn btn-outline-secondary dropdown-toggle bg-white text-dark border" type="button" id="viewDropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <i class="fa fa-navicon me-2"></i>Summary
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end shadow-sm" aria-labelledby="viewDropdown">
+                <li><a class="dropdown-item view-mode-btn" data-mode="card" href="#"><i class="fa fa-th me-2"></i>Card</a></li>
+                <li><a class="dropdown-item view-mode-btn" data-mode="list" href="#"><i class="fa fa-list me-2"></i>List</a></li>
+                <li><a class="dropdown-item active view-mode-btn" data-mode="summary" href="#"><i class="fa fa-navicon me-2"></i>Summary</a></li>
+            </ul>
+        </div>
+    </div>
+    <!-- Course Card Grid -->
+    {{#hascourses}}
+    <div id="courseGrid" class="row row-cols-1 g-4 view-mode-summary">
+        {{#courses}}
+        <div class="col">
+            <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden position-relative course-card-hover transition-all">
+                
+                <!-- Course Card Image or Gradient Header -->
+                {{#courseimage}}
+                <div class="course-card-image" style="background-image: url('{{{courseimage}}}'); height: 180px; background-size: cover; background-position: center;">
+                </div>
+                {{/courseimage}}
+                {{^courseimage}}
+                <div class="course-card-image d-flex align-items-center justify-content-center" style="background: linear-gradient(135deg, var(--primary-color, #5751E1) 0%, var(--secondary-color, #FFC224) 100%); height: 180px;">
+                    <i class="fa fa-graduation-cap text-white opacity-25" style="font-size: 4rem;"></i>
+                </div>
+                {{/courseimage}}
+
+                <!-- Category Badge on Card -->
+                <div class="position-absolute" style="top: 15px; left: 15px; z-index: 10;">
+                    <span class="badge bg-white text-primary shadow-sm rounded-pill px-3 py-1 font-weight-bold small">
+                        {{coursecategory}}
+                    </span>
+                </div>
+
+                <!-- Card Body -->
+                <div class="card-body p-4 d-flex flex-column">
+                    <!-- Title -->
+                    <h5 class="card-title fw-bold mb-2">
+                        <a href="{{viewurl}}" class="text-decoration-none text-dark hover-primary-text stretched-link">
+                            {{fullname}}
+                        </a>
+                    </h5>
+
+                    <!-- Summary Description -->
+                    <p class="card-text text-muted small flex-grow-1 mb-4">
+                        {{#summary}}{{summary}}{{/summary}}
+                        {{^summary}}No description available for this course.{{/summary}}
+                    </p>
+
+                    <!-- Footer Details: Enrolment/Progress Bar -->
+                    <div class="mt-auto pt-3 border-top border-light">
+                        <div class="course-progress-section">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span class="small font-weight-bold text-muted">Course Completion</span>
+                                <span class="small font-weight-bold text-success">{{#progress}}{{progress}}{{/progress}}{{^progress}}0{{/progress}}%</span>
+                            </div>
+                            <div class="progress rounded-pill" style="height: 8px;">
+                                <div class="progress-bar bg-success rounded-pill" role="progressbar" style="width: {{#progress}}{{progress}}{{/progress}}{{^progress}}0{{/progress}}%;" aria-valuenow="{{#progress}}{{progress}}{{/progress}}{{^progress}}0{{/progress}}" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Course Visibility Badge (Admin/Teacher view only) -->
+                {{^visible}}
+                <div class="position-absolute" style="top: 15px; right: 15px; z-index: 10;">
+                    <span class="badge bg-warning text-dark shadow-sm px-2 py-1 small rounded">
+                        <i class="fa fa-eye-slash me-1"></i> Hidden
+                    </span>
+                </div>
+                {{/visible}}
+
+            </div>
+        </div>
+        {{/courses}}
+    </div>
+    {{/hascourses}}
+
+    <!-- Zero State / Empty State -->
+    {{^hascourses}}
+    <div class="text-center py-5">
+        <div class="mb-4">
+            <i class="fa fa-folder-open-o text-muted opacity-50" style="font-size: 5rem;"></i>
+        </div>
+        <h3 class="fw-bold">No Courses Available</h3>
+        <p class="text-muted max-width-500 mx-auto mt-2">There are currently no courses listed in this category. Check back later or explore other categories.</p>
+        <a href="{{config.wwwroot}}/course/index.php" class="btn btn-primary mt-3 px-4 py-2 rounded-pill">
+            Explore All Courses
+        </a>
+    </div>
+    {{/hascourses}}
+</div>
+
+<style>
+/* CSS Animations & Hover effects for Modern Look */
+.transition-all {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.course-card-hover:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.08) !important;
+}
+
+.hover-primary:hover {
+    background-color: var(--primary-color, #5751E1) !important;
+    color: white !important;
+    border-color: var(--primary-color, #5751E1) !important;
+}
+
+.hover-primary:hover i {
+    color: white !important;
+}
+
+.hover-primary-text:hover {
+    color: var(--primary-color, #5751E1) !important;
+}
+
+.max-width-500 {
+    max-width: 500px;
+}
+
+/* Remove dropdown active/hover/focus background color */
+#course-controls .dropdown-item.active,
+#course-controls .dropdown-item:active,
+#course-controls .dropdown-item:hover,
+#course-controls .dropdown-item:focus {
+    background-color: transparent !important;
+    color: #212529 !important;
+}
+
+/* List/Summary mode overrides */
+.view-mode-list .col, .view-mode-summary .col {
+    width: 100%;
+}
+.view-mode-list .card, .view-mode-summary .card {
+    flex-direction: row;
+}
+.view-mode-list .course-card-image, .view-mode-summary .course-card-image {
+    width: 250px;
+    height: 100% !important;
+    min-height: 150px;
+}
+.view-mode-list .card-body, .view-mode-summary .card-body {
+    width: calc(100% - 250px);
+}
+.view-mode-list .card-text {
+    display: none !important;
+}
+
+@media (max-width: 768px) {
+    .view-mode-list .card, .view-mode-summary .card {
+        flex-direction: column;
+    }
+    .view-mode-list .course-card-image, .view-mode-summary .course-card-image {
+        width: 100%;
+        height: 180px !important;
+    }
+    .view-mode-list .card-body, .view-mode-summary .card-body {
+        width: 100%;
+    }
+}
+</style>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    // Search functionality
+    const searchInput = document.getElementById("courseSearchInput");
+    const courseGrid = document.getElementById("courseGrid");
+    if (searchInput && courseGrid) {
+        searchInput.addEventListener("input", function(e) {
+            const term = e.target.value.toLowerCase();
+            const cols = courseGrid.querySelectorAll(".col");
+            cols.forEach(col => {
+                const title = col.querySelector(".card-title").textContent.toLowerCase();
+                if (title.includes(term)) {
+                    col.style.display = "";
+                } else {
+                    col.style.display = "none";
+                }
+            });
+        });
+    }
+
+    // View mode functionality
+    const viewBtns = document.querySelectorAll(".view-mode-btn");
+    const viewDropdown = document.getElementById("viewDropdown");
+    
+    viewBtns.forEach(btn => {
+        btn.addEventListener("click", function(e) {
+            e.preventDefault();
+            const mode = this.getAttribute("data-mode");
+            
+            // Update button text
+            viewDropdown.innerHTML = this.innerHTML;
+            
+            // Update active state
+            viewBtns.forEach(b => b.classList.remove("active"));
+            this.classList.add("active");
+            
+            // Apply mode
+            if (courseGrid) {
+                courseGrid.classList.remove("row-cols-md-2", "row-cols-lg-3", "view-mode-list", "view-mode-summary");
+                
+                if (mode === "card") {
+                    courseGrid.classList.add("row-cols-md-2", "row-cols-lg-3");
+                } else if (mode === "list") {
+                    courseGrid.classList.add("view-mode-list");
+                } else if (mode === "summary") {
+                    courseGrid.classList.add("view-mode-summary");
+                }
+            }
+        });
+    });
+});
+</script>

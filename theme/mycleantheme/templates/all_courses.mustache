@@ -1,0 +1,467 @@
+<div class="container py-4">
+    <!-- Categories Accordion -->
+    <div class="categories-accordion mb-5">
+        {{#categorytree}}
+        <div class="accordion-item-custom mb-3">
+            <!-- Main Category Header -->
+            <div class="accordion-header-custom p-3 cursor-pointer d-flex align-items-center justify-content-between category-main-header" data-category-id="{{id}}" data-type="main">
+                <div class="d-flex align-items-center">
+                    <i class="fa fa-folder me-3 text-secondary fa-fw"></i>
+                    <span class="fw-bold fs-5">{{name}}</span>
+                </div>
+                <div class="d-flex align-items-center gap-3">
+                    <span class="badge bg-secondary rounded-pill">{{coursecount}}</span>
+                    <i class="fa fa-chevron-down toggle-icon transition-all"></i>
+                </div>
+            </div>
+            
+            <!-- Category Body (Subcategories and Courses) -->
+            <div class="accordion-body-custom" data-parent="{{id}}" style="display: block;">
+                <div class="p-3 ps-5">
+                    {{#haschildren}}
+                        <!-- Subcategories List -->
+                        <div class="subcategories-list mb-4">
+                            <div class="row g-3">
+                                {{#children}}
+                                <div class="col-md-6 col-lg-4">
+                                    <div class="subcategory-item" data-subcategory-id="{{id}}">
+                                        <!-- Subcategory Header -->
+                                        <div class="subcategory-header p-3 cursor-pointer d-flex align-items-center justify-content-between" data-subcategory-id="{{id}}">
+                                            <div class="d-flex align-items-center">
+                                                <i class="fa fa-folder-open-o me-2 text-info"></i>
+                                                <span class="fw-semibold">{{name}}</span>
+                                            </div>
+                                            <div class="d-flex align-items-center gap-2">
+                                                <span class="badge bg-secondary rounded-pill">{{coursecount}}</span>
+                                                <i class="fa fa-chevron-down toggle-icon-sub transition-all"></i>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Subcategory Courses Container -->
+                                        
+                                    </div>
+                                </div>
+                                <div class="subcategory-courses mt-3" data-subcategory="{{id}}" style="display: block;">
+                                            <div class="courses-container" data-category-id="{{id}}">
+                                                <div class="text-center py-3">
+                                                    <div class="spinner-border spinner-border-sm text-primary" role="status">
+                                                        <span class="visually-hidden">Loading...</span>
+                                                    </div>
+                                                    <span class="ms-2 text-muted">Loading courses...</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                {{/children}}
+                            </div>
+                        </div>
+                    {{/haschildren}}
+                    
+                    <!-- If no subcategories, show category courses directly -->
+                    {{^haschildren}}
+                        <div class="category-courses-direct mt-2">
+                            <div class="courses-container" data-category-id="{{id}}">
+                                <div class="text-center py-3">
+                                    <div class="spinner-border spinner-border-sm text-primary" role="status">
+                                        <span class="visually-hidden">Loading...</span>
+                                    </div>
+                                    <span class="ms-2 text-muted">Loading courses...</span>
+                                </div>
+                            </div>
+                        </div>
+                    {{/haschildren}}
+                </div>
+            </div>
+        </div>
+        {{/categorytree}}
+        
+        {{^hascategories}}
+        <div class="text-muted text-center py-4">
+            <i class="fa fa-folder-open-o fa-2x mb-2 opacity-50"></i>
+            <p class="small mb-0">No categories available</p>
+        </div>
+        {{/hascategories}}
+    </div>
+</div>
+
+<style>
+/* Accordion Styles */
+.accordion-item-custom {
+    margin-bottom: 0.5rem;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.accordion-header-custom {
+    transition: all 0.2s ease;
+    cursor: pointer;
+    border-radius: 8px;
+}
+
+.accordion-header-custom:hover {
+    background-color: #f8f9fa !important;
+}
+
+.accordion-header-custom.active {
+    background-color: #e7f1ff !important;
+}
+
+.toggle-icon {
+    transition: transform 0.3s ease;
+}
+
+.toggle-icon.rotated {
+    transform: rotate(180deg);
+}
+
+.accordion-body-custom {
+    transition: all 0.3s ease;
+}
+
+/* Subcategory Styles - No boxes */
+.subcategory-header {
+    transition: all 0.2s ease;
+    cursor: pointer;
+    border-radius: 8px;
+    background-color: #f8f9fa;
+    margin-bottom: 0.75rem;
+}
+
+.subcategory-header:hover {
+    background-color: #e9ecef;
+}
+
+.subcategory-header.active {
+    background-color: #e7f1ff;
+    border-left: 3px solid #0d6efd;
+}
+
+.toggle-icon-sub {
+    transition: transform 0.3s ease;
+    font-size: 0.9rem;
+}
+
+.toggle-icon-sub.rotated {
+    transform: rotate(180deg);
+}
+
+/* Space between subcategory header and courses */
+.subcategory-courses {
+    transition: all 0.3s ease;
+    margin-top: 1rem !important;
+    margin-bottom: 1.5rem;
+}
+
+.category-courses-direct {
+    margin-top: 0.5rem;
+}
+
+/* Course Card Styles - 3 cards per row */
+.courses-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    margin-top: 0.75rem;
+}
+
+@media (max-width: 992px) {
+    .courses-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .courses-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+}
+
+.subcategory-courses .course-card,
+.category-courses-direct .course-card {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid #e9ecef;
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.subcategory-courses .course-card:hover,
+.category-courses-direct .course-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    border-color: #dee2e6;
+}
+
+.course-image-placeholder {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 140px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.course-card-image {
+    height: 140px;
+    background-size: cover;
+    background-position: center;
+}
+
+.cursor-pointer {
+    cursor: pointer;
+}
+
+.transition-all {
+    transition: all 0.3s ease;
+}
+
+/* Animation */
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.accordion-body-custom[style*="display: block"],
+.subcategory-courses[style*="display: block"] {
+    animation: slideDown 0.3s ease-out;
+}
+
+/* Additional styles for course cards */
+.hover-primary:hover {
+    color: #0d6efd !important;
+}
+
+.line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.progress {
+    background-color: #e9ecef;
+    border-radius: 10px;
+    height: 6px;
+}
+
+.progress-bar {
+    border-radius: 10px;
+    transition: width 0.3s ease;
+}
+
+.badge {
+    font-weight: normal;
+}
+
+/* Course card content spacing */
+.course-card .p-3 {
+    padding: 1rem !important;
+}
+
+.course-card h6 {
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+.course-card .small {
+    font-size: 0.85rem;
+}
+</style>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    // Course data from PHP
+    const coursesByCategory = {{{coursesbycategoryjson}}};
+    
+    // Store loaded courses to avoid reloading
+    const loadedCourses = {};
+    
+    // Initialize accordions
+    initAccordions();
+    
+    // Rotate all toggle icons that are expanded by default
+    document.querySelectorAll('.accordion-body-custom[style*="display: block"]').forEach(body => {
+        const parentId = body.getAttribute('data-parent');
+        const header = document.querySelector(`.accordion-header-custom[data-category-id="${parentId}"]`);
+        const icon = header ? header.querySelector('.toggle-icon') : null;
+        if (icon) icon.classList.add('rotated');
+    });
+    
+    document.querySelectorAll('.subcategory-courses[style*="display: block"]').forEach(courses => {
+        const subcategoryId = courses.getAttribute('data-subcategory');
+        const header = document.querySelector(`.subcategory-header[data-subcategory-id="${subcategoryId}"]`);
+        const icon = header ? header.querySelector('.toggle-icon-sub') : null;
+        if (icon) icon.classList.add('rotated');
+        if (header) header.classList.add('active');
+    });
+    
+    // Load all courses for categories without subcategories
+    document.querySelectorAll('.category-courses-direct .courses-container').forEach(container => {
+        const categoryId = container.getAttribute('data-category-id');
+        if (categoryId) {
+            loadCoursesForContainer(categoryId, `.category-courses-direct .courses-container[data-category-id="${categoryId}"]`);
+        }
+    });
+    
+    // Load all courses for subcategories
+    document.querySelectorAll('.subcategory-courses .courses-container').forEach(container => {
+        const categoryId = container.getAttribute('data-category-id');
+        if (categoryId) {
+            loadCoursesForContainer(categoryId, `.subcategory-courses .courses-container[data-category-id="${categoryId}"]`);
+        }
+    });
+    
+    function initAccordions() {
+        // Handle main category headers (Expand/Collapse)
+        const mainCategoryHeaders = document.querySelectorAll('.accordion-header-custom[data-type="main"]');
+        mainCategoryHeaders.forEach(header => {
+            header.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const categoryId = this.getAttribute('data-category-id');
+                toggleMainCategory(categoryId);
+            });
+        });
+        
+        // Handle subcategory headers (Expand/Collapse and load courses)
+        const subcategoryHeaders = document.querySelectorAll('.subcategory-header');
+        subcategoryHeaders.forEach(header => {
+            header.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const subcategoryId = this.getAttribute('data-subcategory-id');
+                toggleSubcategory(subcategoryId, this);
+            });
+        });
+    }
+    
+    function toggleMainCategory(categoryId) {
+        const body = document.querySelector(`.accordion-body-custom[data-parent="${categoryId}"]`);
+        const header = document.querySelector(`.accordion-header-custom[data-category-id="${categoryId}"]`);
+        const icon = header ? header.querySelector('.toggle-icon') : null;
+        
+        if (body) {
+            if (body.style.display === 'none' || !body.style.display) {
+                body.style.display = 'block';
+                if (icon) icon.classList.add('rotated');
+            } else {
+                body.style.display = 'none';
+                if (icon) icon.classList.remove('rotated');
+            }
+        }
+    }
+    
+    function toggleSubcategory(subcategoryId, headerElement) {
+        const coursesContainer = document.querySelector(`.subcategory-courses[data-subcategory="${subcategoryId}"]`);
+        const icon = headerElement.querySelector('.toggle-icon-sub');
+        
+        if (coursesContainer) {
+            if (coursesContainer.style.display === 'none' || !coursesContainer.style.display) {
+                coursesContainer.style.display = 'block';
+                if (icon) icon.classList.add('rotated');
+                headerElement.classList.add('active');
+            } else {
+                coursesContainer.style.display = 'none';
+                if (icon) icon.classList.remove('rotated');
+                headerElement.classList.remove('active');
+            }
+        }
+    }
+    
+    function loadCoursesForContainer(categoryId, containerSelector) {
+        // Check if already loaded
+        if (loadedCourses[categoryId]) {
+            renderCoursesInContainer(containerSelector, loadedCourses[categoryId]);
+            return;
+        }
+        
+        const container = document.querySelector(containerSelector);
+        if (!container) return;
+        
+        // Convert categoryId to number for lookup
+        const catIdNum = parseInt(categoryId);
+        let courses = coursesByCategory[catIdNum] || [];
+        
+        // Store loaded courses
+        loadedCourses[categoryId] = courses;
+        
+        // Render courses
+        renderCoursesInContainer(containerSelector, courses);
+    }
+    
+    function renderCoursesInContainer(containerSelector, courses) {
+        const container = document.querySelector(containerSelector);
+        if (!container) return;
+        
+        if (!courses || courses.length === 0) {
+            container.innerHTML = `
+                <div class="text-center py-4">
+                    <i class="fa fa-folder-open-o fa-3x text-muted opacity-50 mb-2"></i>
+                    <p class="text-muted mb-0">No courses available in this category</p>
+                </div>
+            `;
+            return;
+        }
+        
+        let html = '<div class="courses-grid">';
+        courses.forEach(course => {
+            const courseImage = course.courseimage ? 
+                `<div class="course-card-image" style="background-image: url('${course.courseimage}');"></div>` :
+                `<div class="course-image-placeholder">
+                    <i class="fa fa-graduation-cap text-white opacity-50" style="font-size: 3rem;"></i>
+                </div>`;
+            
+            const hiddenBadge = !course.visible ? 
+                `<span class="badge bg-warning text-dark ms-2">
+                    <i class="fa fa-eye-slash me-1"></i> Hidden
+                </span>` : '';
+            
+            const progressValue = course.progress || 0;
+            
+            html += `
+                <div class="course-card">
+                    ${courseImage}
+                    <div class="p-3 d-flex flex-column flex-grow-1">
+                        <div class="d-flex align-items-start justify-content-between mb-2">
+                            <h6 class="fw-bold mb-0">
+                                <a href="${course.viewurl}" class="text-decoration-none text-dark hover-primary">
+                                    ${escapeHtml(course.fullname)}
+                                </a>
+                            </h6>
+                            ${hiddenBadge}
+                        </div>
+                        <p class="small text-muted mb-3 line-clamp-2 flex-grow-1">
+                            ${escapeHtml(course.summary || 'No description available.')}
+                        </p>
+                        <div class="mt-auto">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <small class="text-muted">Progress</small>
+                                <small class="text-success fw-bold">${progressValue}%</small>
+                            </div>
+                            <div class="progress">
+                                <div class="progress-bar bg-success" role="progressbar" style="width: ${progressValue}%;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+        html += '</div>';
+        
+        container.innerHTML = html;
+    }
+    
+    function escapeHtml(text) {
+        if (!text) return '';
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+});
+</script>
