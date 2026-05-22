@@ -184,8 +184,107 @@ class block_blogpost extends block_base {
         
         $html .= '    </p>';
         $html .= '    <p class="card-text">' . $this->format_blog_text($blog->blog_text) . '</p>';
+        
+        // Fetch replies
+        global $DB, $USER;
+        $replies = $DB->get_records_sql("SELECT r.*, u.firstname, u.lastname, u.username FROM {block_blogpost_replies} r JOIN {user} u ON r.userid = u.id WHERE r.postid = ? ORDER BY r.timecreated ASC", [$blog->id]);
+
+        // Organize replies by parentid
+        $replies_by_parent = [];
+        foreach ($replies as $reply) {
+            $parentid = isset($reply->parentid) ? $reply->parentid : 0;
+            $replies_by_parent[$parentid][] = $reply;
+        }
+
+        $html .= '    <div class="replies-section mt-3 pt-2 border-top">';
+        $html .= $this->render_replies(0, $replies_by_parent, $blog->id);
+        
+        // Primary Reply toggle button
+        $html .= '<div class="mt-2 text-left">';
+        $html .= '<span class="reply-footer-link show-main-reply" data-postid="' . $blog->id . '">Comment</span>';
+        $html .= '</div>';
+        
+        // Hidden Primary Reply form
+        $html .= '<div class="reply-form" id="main-reply-form-' . $blog->id . '" style="display:none;">';
+        $html .= '<div class="input-group input-group-sm">';
+        $html .= '<input type="text" class="form-control reply-input" data-postid="' . $blog->id . '" data-parentid="0" placeholder="Write a comment...">';
+        $html .= '<div class="input-group-append">';
+        $html .= '<button class="btn btn-primary reply-submit" data-postid="' . $blog->id . '" data-parentid="0">Send</button>';
+        $html .= '<button class="btn btn-link text-muted cancel-main-reply" data-postid="' . $blog->id . '" style="font-size:0.75rem;">Cancel</button>';
+        $html .= '</div>';
+        $html .= '</div>';
+        $html .= '</div>';
+        $html .= '    </div>';
+        
         $html .= '  </div>';
         $html .= '</div>';
+        return $html;
+    }
+
+    private function render_replies($parentid, $replies_by_parent, $postid, $depth = 0, $parentfullname = '') {
+        if (!isset($replies_by_parent[$parentid])) {
+            return '';
+        }
+
+        $html = '';
+        if ($depth > 0) {
+            $count = count($replies_by_parent[$parentid]);
+            $html .= '<div class="replies-wrapper" id="replies-wrapper-' . $parentid . '" style="display:none; transition: all 0.3s ease;">';
+        }
+
+        foreach ($replies_by_parent[$parentid] as $reply) {
+            $replytime = userdate($reply->timecreated, get_string('strftimedatetimeshort', 'langconfig'));
+            $replyauthor_full = fullname($reply);
+            $replyauthor_short = current(explode(' ', $replyauthor_full));
+            $replyusername = $reply->username;
+            
+            // Context Arrow: User A ➔ User B
+            $parentinfo = '';
+            if (!empty($parentfullname)) {
+                $parentinfo = ' <i class="fa fa-caret-right text-muted mx-1"></i> <span class="text-primary" style="font-weight:600; cursor:default;">' . s($parentfullname) . '</span>';
+            }
+            
+            $indent = ($depth == 1) ? 'ml-4' : '';
+            $html .= '<div class="reply-item ' . $indent . ' mt-1">';
+            
+            // The Bubble
+            $html .= '<div class="reply-content-wrapper">';
+            $html .=   '<div class="reply-author-name">' . s($replyauthor_full) . $parentinfo . '</div>';
+            $html .=   '<div class="reply-text">' . $this->format_blog_text($reply->reply_text) . '</div>';
+            $html .= '</div>';
+            
+            // The Footer (Reply | Time)
+            $html .= '<div class="reply-item-footer">';
+            $html .=   '<span class="reply-footer-link show-reply-input" data-replyid="' . $reply->id . '">Reply</span> ';
+            
+            // Toggle for children if they exist
+            if (isset($replies_by_parent[$reply->id])) {
+                $childcount = count($replies_by_parent[$reply->id]);
+                $html .= '<span class="reply-footer-link toggle-replies" data-target="replies-wrapper-' . $reply->id . '">View ' . $childcount . ' replies</span> ';
+            }
+
+            $html .=   '<span class="reply-time">' . $replytime . '</span>';
+            $html .= '</div>';
+            
+            // Nested reply form
+            $html .= '<div class="nested-reply-form" id="reply-form-' . $reply->id . '" style="display:none;">';
+            $html .=   '<div class="input-group input-group-sm mt-1">';
+            $html .=     '<input type="text" class="form-control reply-input" id="reply-input-' . $reply->id . '" data-postid="' . $postid . '" data-parentid="' . $reply->id . '" placeholder="Reply to ' . s($replyauthor_short) . '...">';
+            $html .=     '<div class="input-group-append">';
+            $html .=       '<button class="btn btn-primary reply-submit" data-postid="' . $postid . '" data-parentid="' . $reply->id . '">Send</button>';
+            $html .=       '<button class="btn btn-link text-muted cancel-reply" data-replyid="' . $reply->id . '" style="font-size:0.7rem;">Cancel</button>';
+            $html .=     '</div>';
+            $html .=   '</div>';
+            $html .= '</div>';
+
+            // Recursive call for nested replies
+            $html .= $this->render_replies($reply->id, $replies_by_parent, $postid, $depth + 1, $replyauthor_full);
+            $html .= '</div>';
+        }
+
+        if ($depth > 0) {
+            $html .= '</div>';
+        }
         return $html;
     }
 

@@ -40,41 +40,41 @@ class send_blog_emails extends \core\task\adhoc_task {
 
         $data = $this->get_custom_data();
         if (empty($data->postid)) {
-            mtrace("Error: No post ID specified.");
+            // mtrace("Error: No post ID specified.");
             return;
         }
 
         $postid = $data->postid;
-        mtrace("Starting immediate blog post email task for Post ID: {$postid}");
+        // mtrace("Starting blog post email task for Post ID: {$postid}");
 
         // Fetch post
         $post = $DB->get_record('block_blogpost', ['id' => $postid]);
         if (!$post) {
-            mtrace("Error: Blog post ID {$postid} not found.");
+            // mtrace("Error: Blog post ID {$postid} not found.");
             return;
         }
 
         // Avoid duplicate emails if another task already processed this post
         if (!empty($post->email_sent)) {
-            mtrace("Notice: Emails have already been sent for Post ID {$postid}. Skipping to prevent duplicates.");
+            // mtrace("Notice: Emails have already been sent for Post ID {$postid}. Skipping to prevent duplicates.");
             return;
         }
 
         // Fetch author
         $author = $DB->get_record('user', ['id' => $post->userid]);
         if (!$author) {
-            mtrace("Error: Author for blog post ID {$postid} not found.");
+            // mtrace("Error: Author for blog post ID {$postid} not found.");
             return;
         }
 
-        // 1. Process mentions (@username)
-        $mentionedusers = $this->get_mentioned_users($post);
-        
-        // 2. Process general/tag subscribers
-        $subscribingusers = $this->get_subscribing_users($post, array_keys($mentionedusers));
-
         $from = $author;
         $authorname = fullname($author);
+
+        // 1. Process mentions (@username) - these ALWAYS get notified
+        $mentionedusers = $this->get_mentioned_users($post);
+        
+        // 2. Get users who want email updates (excluding mentioned users to avoid duplicates)
+        $subscribingusers = $this->get_subscribing_users($post, array_keys($mentionedusers));
 
         // Send to mentioned users
         $mentionedcount = 0;
@@ -92,13 +92,13 @@ class send_blog_emails extends \core\task\adhoc_task {
                 $generalcount++;
             }
         }
-        mtrace("Sent {$generalcount} general/tag notifications.");
+        // mtrace("Sent {$generalcount} general notifications.");
 
         // Mark post as processed
         $post->email_sent = 1;
         $DB->update_record('block_blogpost', $post);
 
-        mtrace("Email task for Post ID {$postid} completed successfully.");
+        // mtrace("Email task for Post ID {$postid} completed successfully.");
     }
 
     /**
@@ -107,7 +107,7 @@ class send_blog_emails extends \core\task\adhoc_task {
     private function get_mentioned_users($post) {
         global $DB;
         $mentioned = [];
-        $text = $post->blog_heading . ' ' . $post->blog_text;
+        $text = $post->blog_heading . ' ' . $post->blog_text . ' ' . $post->tags;
 
         // Pattern matches @username where username has typical moodle username chars
         if (preg_match_all('/@([a-zA-Z0-9_.-]+)/', $text, $matches)) {
@@ -129,48 +129,38 @@ class send_blog_emails extends \core\task\adhoc_task {
     }
 
     /**
-     * Get other subscribing users (excluding mentioned ones to avoid duplicates)
+     * Get subscribing users (excluding mentioned ones to avoid duplicates)
+     * Users who have enabled email_updates = 1 will receive all blog post notifications
      */
     private function get_subscribing_users($post, $excludids) {
         global $DB;
 
-        // Query users with preference record (excluding Guest user which has ID 1)
-        $sql = "SELECT u.*, p.email_notifications, p.notify_tags
+        // Query users who have email_updates enabled (excluding Guest user which has ID 1)
+        $sql = "SELECT u.*, p.email_updates
                 FROM {user} u
                 LEFT JOIN {block_blogpost_prefs} p ON u.id = p.userid
                 WHERE u.deleted = 0 
                 AND u.suspended = 0
                 AND u.id > 1
-                AND u.id != :authorid";
+                AND u.id != :authorid
+                AND (p.email_updates = 1 OR (p.email_updates IS NULL AND :defaultvalue = 0))";
         
-        $params = ['authorid' => $post->userid];
+        $params = [
+            'authorid' => $post->userid,
+            'defaultvalue' => 0
+        ];
+        
         $users = $DB->get_records_sql($sql, $params);
-
+        
         $recipients = [];
-        $posttags = !empty($post->tags) ? explode(',', $post->tags) : [];
-        $posttags = array_map('trim', array_map('strtolower', $posttags));
 
         foreach ($users as $user) {
             // Exclude already-notified mentioned users
             if (in_array($user->id, $excludids)) {
                 continue;
             }
-
-            $wantsgeneral = ($user->email_notifications === null || $user->email_notifications == 1);
-            $hastags = !empty($user->notify_tags);
-
-            if ($wantsgeneral && !$hastags) {
-                // General updates enabled with no tag filter
-                $recipients[$user->id] = $user;
-            } else if ($hastags && !empty($posttags)) {
-                // Custom tag filter matches post tags
-                $usertags = explode(',', $user->notify_tags);
-                $usertags = array_map('trim', array_map('strtolower', $usertags));
-                
-                if (array_intersect($usertags, $posttags)) {
-                    $recipients[$user->id] = $user;
-                }
-            }
+            
+            $recipients[$user->id] = $user;
         }
 
         return $recipients;
@@ -180,7 +170,7 @@ class send_blog_emails extends \core\task\adhoc_task {
      * Send email to a mentioned user
      */
     private function send_mention_email($user, $post, $authorname, $from) {
-        $subject = get_string('mentionemailsubject', 'block_blogpost', $post->blog_heading);
+        $subject = s($authorname) . " mentioned you in a post";
         
         $messagehtml = $this->get_mention_email_html($user, $post, $authorname);
         $messagetext = $this->get_mention_email_text($user, $post, $authorname);
@@ -229,22 +219,32 @@ class send_blog_emails extends \core\task\adhoc_task {
                 <div class='content'>
                     <p>Hi " . s($user->firstname) . ",</p>
                     <p><strong>" . s($authorname) . "</strong> mentioned you in a new blog post:</p>
-                    <h3 class='post-heading'>" . s($post->blog_heading) . "</h3>
                     <div class='post-meta'>
                         Posted on: " . userdate($post->timecreated) . "
                     </div>
+                    <h3 class='post-heading'>" . s($post->blog_heading) . "</h3>
                     <div class='post-text'>
                         " . nl2br(s($post->blog_text)) . "
                     </div>";
         
         if (!empty($post->tags)) {
-            $html .= "<div class='tags'>
-                        <strong>Tags:</strong> ";
             $tags = explode(',', $post->tags);
+            $visible_tags = [];
             foreach ($tags as $tag) {
-                $html .= "<span class='tag'>" . s(trim($tag)) . "</span>";
+                $trimmed = trim($tag);
+                if (strpos($trimmed, '@') !== 0) {
+                    $visible_tags[] = $trimmed;
+                }
             }
-            $html .= "</div>";
+            
+            if (!empty($visible_tags)) {
+                $html .= "<div class='tags'>
+                            <strong>Tags:</strong> ";
+                foreach ($visible_tags as $tag) {
+                    $html .= "<span class='tag'>" . s($tag) . "</span>";
+                }
+                $html .= "</div>";
+            }
         }
         
         $html .= "<div style='text-align: center; margin-top: 30px;'>
@@ -308,23 +308,33 @@ class send_blog_emails extends \core\task\adhoc_task {
                 </div>
                 <div class='content'>
                     <p>Hi " . s($user->firstname) . ",</p>
-                    <h3 class='post-heading'>" . s($post->blog_heading) . "</h3>
                     <div class='post-meta'>
                         Posted by: <strong>" . s($authorname) . "</strong><br>
-                        Date: " . userdate($post->timecreated) .
-                    "</div>
+                        Date: " . userdate($post->timecreated) . "
+                    </div>
+                    <h3 class='post-heading'>" . s($post->blog_heading) . "</h3>
                     <div class='post-text'>
                         " . nl2br(s($post->blog_text)) . "
                     </div>";
         
         if (!empty($post->tags)) {
-            $html .= "<div class='tags'>
-                        <strong>Tags:</strong> ";
             $tags = explode(',', $post->tags);
+            $visible_tags = [];
             foreach ($tags as $tag) {
-                $html .= "<span class='tag'>" . s(trim($tag)) . "</span>";
+                $trimmed = trim($tag);
+                if (strpos($trimmed, '@') !== 0) {
+                    $visible_tags[] = $trimmed;
+                }
             }
-            $html .= "</div>";
+            
+            if (!empty($visible_tags)) {
+                $html .= "<div class='tags'>
+                            <strong>Tags:</strong> ";
+                foreach ($visible_tags as $tag) {
+                    $html .= "<span class='tag'>" . s($tag) . "</span>";
+                }
+                $html .= "</div>";
+            }
         }
         
         $html .= "<div style='text-align: center; margin-top: 30px;'>
@@ -332,8 +342,8 @@ class send_blog_emails extends \core\task\adhoc_task {
                     </div>
                 </div>
                 <div class='footer'>
-                    You are receiving this email because you subscribed to updates from the Blog Post block.<br>
-                    You can manage notification preferences in your Moodle profile settings.
+                    You are receiving this email because you subscribed to email updates from the Blog Post block.<br>
+                    You can manage your notification preferences in your Moodle profile settings.
                 </div>
             </div>
         </body>

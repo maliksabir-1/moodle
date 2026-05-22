@@ -36,22 +36,10 @@ class preferences_form extends \moodleform {
         // Get existing preferences
         $preferences = $DB->get_record('block_blogpost_prefs', ['userid' => $USER->id]);
         
-        // Email notifications
-        $mform->addElement('header', 'emailsettings', get_string('emailsettings', 'block_blogpost'));
-        
-        $mform->addElement('checkbox', 'email_notifications', get_string('emailnotifications', 'block_blogpost'));
-        $mform->setDefault('email_notifications', $preferences ? $preferences->email_notifications : 1);
-        $mform->addHelpButton('email_notifications', 'emailnotifications', 'block_blogpost');
-        
-        // Tag preferences
-        $mform->addElement('header', 'tagsettings', get_string('tagsettings', 'block_blogpost'));
-        
-        $mform->addElement('text', 'notify_tags', get_string('notifytags', 'block_blogpost'));
-        $mform->setType('notify_tags', PARAM_TEXT);
-        $mform->setDefault('notify_tags', $preferences ? $preferences->notify_tags : '');
-        $mform->addHelpButton('notify_tags', 'notifytags', 'block_blogpost');
-        
-        $mform->addElement('static', 'tag_example', '', get_string('tagexample', 'block_blogpost'));
+        // Email notifications - option to receive all blog post updates
+        $mform->addElement('checkbox', 'email_updates', get_string('emailupdates', 'block_blogpost'));
+        $mform->setDefault('email_updates', $preferences ? $preferences->email_updates : 0);
+        $mform->addHelpButton('email_updates', 'emailupdates', 'block_blogpost');
         
         $this->add_action_buttons(false, get_string('savepreferences', 'block_blogpost'));
     }
