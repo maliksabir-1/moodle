@@ -82,7 +82,22 @@ $regionmainsettingsmenu = $buildregionmainsettings ? $OUTPUT->region_main_settin
 $header = $PAGE->activityheader;
 $headercontent = $header->export_for_template($renderer);
 
+// Fetch Level and Badge info for Navbar
+$user_level_info = null;
+if (isloggedin()) {
+    $user_level_info = \local_point_badges\manager::get_user_level_info($USER->id);
+    // Add simple truthy flags for levels
+    if ($user_level_info) {
+        $lvl = $user_level_info['current_level'];
+        $user_level_info['is_level_1'] = ($lvl == 1);
+        $user_level_info['is_level_2'] = ($lvl == 2);
+        $user_level_info['is_level_3'] = ($lvl == 3);
+        $user_level_info['is_level_4'] = ($lvl >= 4);
+    }
+}
+
 $templatecontext = [
+    'user_level' => $user_level_info,
     'sitename' => format_string($SITE->shortname, true, ['context' => context_course::instance(SITEID), "escape" => false]),
     'output' => $OUTPUT,
     'sidepreblocks' => $blockshtml,

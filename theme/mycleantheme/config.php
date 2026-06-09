@@ -38,4 +38,5 @@ $THEME->layouts = [
         'regions' => ['side-pre'],
         'defaultregion' => 'side-pre',
     ],
+    
 ];

@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<XMLDB PATH="local/point_badges/db" VERSION="2026021600" COMMENT="Point Badges System">
+  <TABLES>
+    <!-- User XP totals -->
+    <TABLE NAME="local_pb_user_xp" COMMENT="Tracks user XP and levels">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0"/>
+        <FIELD NAME="total_xp" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0"/>
+        <FIELD NAME="current_level" TYPE="int" LENGTH="5" NOTNULL="true" DEFAULT="1"/>
+        <FIELD NAME="courseid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="user_course" TYPE="unique" FIELDS="userid, courseid"/>
+        <KEY NAME="userid" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id"/>
+        <KEY NAME="courseid" TYPE="foreign" FIELDS="courseid" REFTABLE="course" REFFIELDS="id"/>
+      </KEYS>
+    </TABLE>
+
+    <!-- Daily login streaks -->
+    <TABLE NAME="local_pb_streak" COMMENT="Tracks user login streaks">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0"/>
+        <FIELD NAME="current_streak" TYPE="int" LENGTH="5" NOTNULL="true" DEFAULT="0"/>
+        <FIELD NAME="max_streak" TYPE="int" LENGTH="5" NOTNULL="true" DEFAULT="0"/>
+        <FIELD NAME="last_login_date" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="user" TYPE="unique" FIELDS="userid"/>
+        <KEY NAME="userid" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id"/>
+      </KEYS>
+    </TABLE>
+
+    <!-- XP Log for history -->
+    <TABLE NAME="local_pb_xp_log" COMMENT="Log of all XP earnings">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0"/>
+        <FIELD NAME="courseid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0"/>
+        <FIELD NAME="xp_amount" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0"/>
+        <FIELD NAME="reason" TYPE="char" LENGTH="100" NOTNULL="true"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="userid" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id"/>
+        <KEY NAME="courseid" TYPE="foreign" FIELDS="courseid" REFTABLE="course" REFFIELDS="id"/>
+      </KEYS>
+    </TABLE>
+
+    <!-- Daily challenges definitions -->
+    <TABLE NAME="local_pb_challenge" COMMENT="Daily challenge definitions">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="true"/>
+        <FIELD NAME="description" TYPE="text" NOTNULL="false"/>
+        <FIELD NAME="event_name" TYPE="char" LENGTH="100" NOTNULL="true"/>
+        <FIELD NAME="required_count" TYPE="int" LENGTH="5" NOTNULL="true" DEFAULT="1"/>
+        <FIELD NAME="xp_reward" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0"/>
+        <FIELD NAME="active" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="1"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+    </TABLE>
+
+    <!-- User challenge progress -->
+    <TABLE NAME="local_pb_user_challenge" COMMENT="Tracks user progress on daily challenges">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0"/>
+        <FIELD NAME="challengeid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0"/>
+        <FIELD NAME="progress" TYPE="int" LENGTH="5" NOTNULL="true" DEFAULT="0"/>
+        <FIELD NAME="completed" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0"/>
+        <FIELD NAME="date_assigned" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="user_challenge_date" TYPE="unique" FIELDS="userid, challengeid, date_assigned"/>
+        <KEY NAME="userid" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id"/>
+        <KEY NAME="challengeid" TYPE="foreign" FIELDS="challengeid" REFTABLE="local_pb_challenge" REFFIELDS="id"/>
+      </KEYS>
+    </TABLE>
+
+    <!-- Level definitions -->
+    <TABLE NAME="local_pb_levels" COMMENT="Level configuration">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="level_number" TYPE="int" LENGTH="5" NOTNULL="true" DEFAULT="1"/>
+        <FIELD NAME="level_name" TYPE="char" LENGTH="50" NOTNULL="true"/>
+        <FIELD NAME="min_xp" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0"/>
+        <FIELD NAME="max_xp" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0"/>
+        <FIELD NAME="badge_url" TYPE="char" LENGTH="255" NOTNULL="false"/>
+        <FIELD NAME="badge_color" TYPE="char" LENGTH="20" NOTNULL="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+    </TABLE>
+  </TABLES>
+  <!-- Certificates issued
+<TABLE NAME="local_pb_certificates" COMMENT="Certificates issued to users">
+  <FIELDS>
+    <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+    <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0"/>
+    <FIELD NAME="certificate_name" TYPE="char" LENGTH="255" NOTNULL="true"/>
+    <FIELD NAME="certificate_code" TYPE="char" LENGTH="50" NOTNULL="true"/>
+    <FIELD NAME="issued_date" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0"/>
+    <FIELD NAME="downloaded" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0"/>
+  </FIELDS>
+  <KEYS>
+    <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+    <KEY NAME="userid" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id"/>
+  </KEYS>
+</TABLE> -->
+<!-- Level restrictions for activities -->
+<TABLE NAME="local_pb_restrictions" COMMENT="Level restrictions for course activities">
+  <FIELDS>
+    <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+    <FIELD NAME="cmid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0"/>
+    <FIELD NAME="restricted_level" TYPE="int" LENGTH="5" NOTNULL="true" DEFAULT="1"/>
+    <FIELD NAME="courseid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0"/>
+  </FIELDS>
+  <KEYS>
+    <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+    <KEY NAME="cmid" TYPE="unique" FIELDS="cmid"/>
+  </KEYS>
+</TABLE>
+<!-- Coupons table -->
+<TABLE NAME="local_pb_coupons" COMMENT="Coupons generated by users">
+  <FIELDS>
+    <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+    <FIELD NAME="code" TYPE="char" LENGTH="50" NOTNULL="true"/>
+    <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0"/>
+    <FIELD NAME="type" TYPE="char" LENGTH="50" NOTNULL="true"/>
+    <FIELD NAME="xp_cost" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0"/>
+    <FIELD NAME="used" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0"/>
+    <FIELD NAME="used_by" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0"/>
+    <FIELD NAME="used_at" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0"/>
+    <FIELD NAME="created_at" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0"/>
+    <FIELD NAME="expires_at" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0"/>
+  </FIELDS>
+  <KEYS>
+    <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+    <KEY NAME="code" TYPE="unique" FIELDS="code"/>
+  </KEYS>
+</TABLE>
+<!-- Premium activity restrictions -->
+<TABLE NAME="local_pb_premium_restrictions" COMMENT="Activities marked as premium content that require unlock">
+  <FIELDS>
+    <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+    <FIELD NAME="cmid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0"/>
+    <FIELD NAME="is_premium" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="1"/>
+    <FIELD NAME="courseid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0"/>
+  </FIELDS>
+  <KEYS>
+    <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+    <KEY NAME="cmid" TYPE="unique" FIELDS="cmid"/>
+  </KEYS>
+</TABLE>
+
+<!-- VIP activity restrictions -->
+<TABLE NAME="local_pb_vip_restrictions" COMMENT="VIP-only activities that require special access">
+  <FIELDS>
+    <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+    <FIELD NAME="cmid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0"/>
+    <FIELD NAME="is_vip_only" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="1"/>
+    <FIELD NAME="courseid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0"/>
+    <FIELD NAME="early_access_days" TYPE="int" LENGTH="5" NOTNULL="true" DEFAULT="7"/>
+  </FIELDS>
+  <KEYS>
+    <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+    <KEY NAME="cmid" TYPE="unique" FIELDS="cmid"/>
+  </KEYS>
+</TABLE>
+
+<!-- Track unlocked activities for users -->
+<TABLE NAME="local_pb_unlocked_activities" COMMENT="Tracks which activities users have unlocked">
+  <FIELDS>
+    <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+    <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0"/>
+    <FIELD NAME="cmid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0"/>
+    <FIELD NAME="unlocked_at" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0"/>
+    <FIELD NAME="is_vip" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0"/>
+  </FIELDS>
+  <KEYS>
+    <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+    <KEY NAME="user_cm" TYPE="unique" FIELDS="userid, cmid"/>
+    <KEY NAME="userid" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id"/>
+  </KEYS>
+</TABLE>
+<!-- Extra quiz attempts -->
+<TABLE NAME="local_pb_extra_attempts" COMMENT="Extra quiz attempts purchased with XP">
+  <FIELDS>
+    <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+    <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0"/>
+    <FIELD NAME="quizid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0"/>
+    <FIELD NAME="extra_attempts" TYPE="int" LENGTH="5" NOTNULL="true" DEFAULT="0"/>
+    <FIELD NAME="used_attempts" TYPE="int" LENGTH="5" NOTNULL="true" DEFAULT="0"/>
+  </FIELDS>
+  <KEYS>
+    <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+    <KEY NAME="user_quiz" TYPE="unique" FIELDS="userid, quizid"/>
+  </KEYS>
+</TABLE>
+</XMLDB>

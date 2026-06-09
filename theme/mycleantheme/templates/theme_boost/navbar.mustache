@@ -97,6 +97,7 @@
         <a href="{{{ config.wwwroot }}}/course/index.php" class="btn btn-link nav-link py-0 px-2" title="All courses">
             <span class="d-none d-md-inline">All courses</span>
         </a>
+        
     </div>
 
     <!-- Categories Link -->
@@ -112,9 +113,25 @@
             <i class="fa fa-search"></i>
         </a>
     </div>
+    
 
     <!-- NOTIFICATION ICON (THIS WAS MISSING) -->
     {{{ output.navbar_plugin_output }}}
+    
+    {{#user_level}}
+    <div class="d-none d-md-flex align-items-center me-2">
+        <div class="user-level-badge p-1 px-3 d-flex align-items-center" 
+             style="background: linear-gradient(135deg, {{badge_color}} 0%, #333 100%); border-radius: 20px; color: white; box-shadow: 0 2px 5px rgba(0,0,0,0.2); height: 38px;">
+            <span class="fw-bold small me-2">{{level_name}}</span>
+            {{#badge_url}}
+                <img src="{{badge_url}}" alt="{{level_name}}" style="width: 24px; height: 24px; object-fit: contain;">
+            {{/badge_url}}
+            {{^badge_url}}
+                <i class="fa {{fallback_icon}} text-warning" style="font-size: 1.1rem;"></i>
+            {{/badge_url}}
+        </div>
+    </div>
+    {{/user_level}}
     
     <div class="d-flex align-items-stretch usermenu-container" data-region="usermenu">
         {{#usermenu}}

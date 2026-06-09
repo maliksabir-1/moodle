@@ -1,0 +1,22 @@
+.local_point_badges_restricted {
+    opacity: 0.5;
+    filter: grayscale(0.5);
+    position: relative;
+}
+
+.local_point_badges_restricted:before {
+    content: "🔒";
+    position: absolute;
+    left: -5px;
+    top: -5px;
+    font-size: 16px;
+    background: rgba(255,255,255,0.9);
+    border-radius: 50%;
+    padding: 2px;
+    z-index: 1;
+}
+
+.local_point_badges_restricted a {
+    pointer-events: none;
+    cursor: not-allowed;
+}
