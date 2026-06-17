@@ -1,0 +1,363 @@
+/* local/advancedanalytics/styles/styles.css */
+
+:root {
+    --aa-primary: #6366f1;
+    --aa-primary-hover: #4f46e5;
+    --aa-secondary: #ec4899;
+    --aa-accent: #8b5cf6;
+    --aa-success: #10b981;
+    --aa-warning: #f59e0b;
+    --aa-danger: #ef4444;
+    --aa-info: #3b82f6;
+    --aa-bg-main: #f8fafc;
+    --aa-bg-card: #ffffff;
+    --aa-text-main: #1e293b;
+    --aa-text-muted: #64748b;
+    --aa-border: #e2e8f0;
+    --aa-radius: 12px;
+    --aa-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    --aa-shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+}
+
+/* Dark Mode support if Moodle theme supports it */
+@media (prefers-color-scheme: dark) {
+    .aa-dark-mode {
+        --aa-bg-main: #0f172a;
+        --aa-bg-card: #1e293b;
+        --aa-text-main: #f1f5f9;
+        --aa-text-muted: #94a3b8;
+        --aa-border: #334155;
+    }
+}
+
+.aa-dashboard-container {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background-color: var(--aa-bg-main);
+    color: var(--aa-text-main);
+    min-height: 100vh;
+    padding: 24px;
+    margin: -20px; /* Offset Moodle default padding if needed */
+}
+
+/* Sidebar Navigation */
+.aa-sidebar {
+    background: var(--aa-bg-card);
+    border-right: 1px solid var(--aa-border);
+    height: 100vh;
+    position: sticky;
+    top: 0;
+    padding: 1.5rem 1rem;
+    z-index: 100;
+}
+
+.aa-nav-item {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    color: var(--aa-text-muted);
+    text-decoration: none !important;
+    border-radius: var(--aa-radius);
+    margin-bottom: 0.5rem;
+    transition: all 0.2s ease;
+    font-weight: 500;
+}
+
+.aa-nav-item i {
+    width: 24px;
+    margin-right: 12px;
+    font-size: 1.1rem;
+}
+
+.aa-nav-item:hover {
+    background-color: #f1f5f9;
+    color: var(--aa-primary);
+}
+
+.aa-nav-item.active {
+    background-color: var(--aa-primary);
+    color: white !important;
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+}
+
+/* Glassmorphism Cards */
+.aa-card {
+    background: var(--aa-bg-card);
+    border: 1px solid var(--aa-border);
+    border-radius: var(--aa-radius);
+    padding: 1.5rem;
+    box-shadow: var(--aa-shadow);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    height: 100%;
+}
+
+.aa-card:hover {
+    box-shadow: var(--aa-shadow-lg);
+}
+
+.aa-glass {
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+/* KPI Widgets */
+.aa-kpi-val {
+    font-size: 2rem;
+    font-weight: 800;
+    line-height: 1;
+    margin: 0.5rem 0;
+}
+
+.aa-kpi-label {
+    font-size: 0.875rem;
+    color: var(--aa-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+    font-weight: 600;
+}
+
+.aa-trend {
+    font-size: 0.875rem;
+    display: flex;
+    align-items: center;
+}
+
+.aa-trend-up { color: var(--aa-success); }
+.aa-trend-down { color: var(--aa-danger); }
+
+/* Charts */
+.aa-chart-container {
+    position: relative;
+    height: 300px;
+    width: 100%;
+}
+
+/* Buttons */
+.aa-btn {
+    padding: 0.625rem 1.25rem;
+    border-radius: var(--aa-radius);
+    font-weight: 600;
+    transition: all 0.2s;
+    border: none;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.aa-btn-primary {
+    background-color: var(--aa-primary);
+    color: white;
+}
+
+.aa-btn-primary:hover {
+    background-color: var(--aa-primary-hover);
+    transform: translateY(-1px);
+}
+
+/* AI Pulse Animation */
+@keyframes pulse-ai {
+    0% { box-shadow: 0 0 0 0 rgba(139, 92, 246, 0.4); }
+    70% { box-shadow: 0 0 0 10px rgba(139, 92, 246, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(139, 92, 246, 0); }
+}
+
+.aa-ai-widget {
+    background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
+    color: white;
+    animation: pulse-ai 2s infinite;
+}
+
+/* Filters Bar */
+.aa-filters-bar {
+    background: var(--aa-bg-card);
+    padding: 1rem;
+    border-radius: var(--aa-radius);
+    margin-bottom: 2rem;
+    border: 1px solid var(--aa-border);
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.aa-filter-select {
+    padding: 0.5rem;
+    border-radius: 8px;
+    border: 1px solid var(--aa-border);
+    min-width: 150px;
+}
+
+/* Data Tables */
+.aa-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.aa-table th {
+    background: #f1f5f9;
+    padding: 1rem;
+    text-align: left;
+    font-weight: 600;
+    color: var(--aa-text-muted);
+}
+
+.aa-table td {
+    padding: 1rem;
+    border-bottom: 1px solid var(--aa-border);
+}
+
+.aa-status-badge {
+    padding: 4px 12px;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+.aa-card-clickable {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid var(--aa-border);
+}
+
+.aa-card-clickable:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: var(--aa-shadow-lg);
+    border-color: var(--aa-primary);
+    background-color: #f8fafc;
+}
+
+.aa-card-clickable .aa-kpi-label {
+    transition: color 0.3s ease;
+}
+
+.aa-card-clickable:hover .aa-kpi-label {
+    color: var(--aa-primary);
+}
+
+/* Premium PHP Component Charts (Vertical) */
+.aa-php-chart-v {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    height: 250px;
+    padding: 32px 20px 20px 20px;
+    margin-bottom: 24px;
+    background: #ffffff;
+    border-radius: 16px;
+    border: 1px solid rgba(0,0,0,0.03);
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
+}
+.aa-php-bar-v-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100%;
+    position: relative;
+}
+.aa-php-bar-v {
+    width: 65%;
+    background: linear-gradient(180deg, var(--aa-primary) 0%, #4338ca 100%);
+    border-radius: 8px 8px 4px 4px;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    position: relative;
+    min-height: 4px;
+    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2);
+}
+.aa-php-bar-v:hover {
+    filter: brightness(1.1);
+    transform: scaleX(1.05);
+    box-shadow: 0 6px 16px rgba(79, 70, 229, 0.3);
+}
+.aa-php-bar-v::after {
+    content: attr(data-value);
+    position: absolute;
+    top: -26px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--aa-primary);
+    color: white;
+    font-size: 10px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-weight: bold;
+    opacity: 0;
+    transition: opacity 0.3s, top 0.3s;
+    pointer-events: none;
+}
+.aa-php-bar-v-container:hover .aa-php-bar-v::after {
+    opacity: 1;
+    top: -30px;
+}
+.aa-php-bar-label {
+    margin-top: 12px;
+    font-size: 0.65rem;
+    color: var(--aa-text-muted);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+/* Premium PHP Component Charts (Horizontal) */
+.aa-php-chart-h {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-top: 15px;
+}
+.aa-php-row-h {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+.aa-php-label-h {
+    width: 120px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--aa-text-main);
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+}
+.aa-php-bar-wrapper-h {
+    flex-grow: 1;
+    background: #f1f5f9;
+    height: 14px;
+    border-radius: 7px;
+    overflow: hidden;
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.05);
+}
+.aa-php-bar-h {
+    height: 100%;
+    background: linear-gradient(90deg, var(--aa-success) 0%, #059669 100%);
+    border-radius: 7px;
+    transition: width 1s ease-out;
+}
+.aa-php-bar-h.warning { background: linear-gradient(90deg, #f59e0b 0%, #d97706 100%); }
+.aa-php-bar-h.danger { background: linear-gradient(90deg, #ef4444 0%, #dc2626 100%); }
+.aa-php-val-h {
+    width: 45px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--aa-text-main);
+    text-align: right;
+}
+
+.aa-progress-ring-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 250px;
+}
+.aa-php-compliance-bar {
+    margin-bottom: 1.5rem;
+}
+.aa-php-compliance-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    font-size: 0.9rem;
+}

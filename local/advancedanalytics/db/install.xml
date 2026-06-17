@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<XMLDB PATH="local/advancedanalytics/db" VERSION="2024100103" COMMENT="Advanced Analytics Database Schema - Optimized">
+  <TABLES>
+    
+    <!-- Analytics Summary Table - Optimized -->
+    <TABLE NAME="local_aa_summary" COMMENT="Aggregated analytics summary - daily snapshots">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="date" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" COMMENT="Unix timestamp for the day"/>
+        <FIELD NAME="department" TYPE="char" LENGTH="100" NOTNULL="false" COMMENT="Department name"/>
+        <FIELD NAME="courseid" TYPE="int" LENGTH="10" NOTNULL="false" DEFAULT="0"/>
+        <FIELD NAME="total_users" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0"/>
+        <FIELD NAME="active_users" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0"/>
+        <FIELD NAME="new_users" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" COMMENT="New users registered on this day"/>
+        <FIELD NAME="completions" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0"/>
+        <FIELD NAME="avg_grade" TYPE="number" LENGTH="5" NOTNULL="true" DEFAULT="0" DECIMALS="2"/>
+        <FIELD NAME="total_time" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" COMMENT="Total time spent in seconds"/>
+        <FIELD NAME="engagement_score" TYPE="number" LENGTH="5" NOTNULL="true" DEFAULT="0" DECIMALS="2"/>
+        <FIELD NAME="logins_count" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" COMMENT="Total logins on this day"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="date_dept_course" TYPE="unique" FIELDS="date, department, courseid"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="date_idx" UNIQUE="false" FIELDS="date"/>
+        <INDEX NAME="dept_idx" UNIQUE="false" FIELDS="department"/>
+        <INDEX NAME="course_idx" UNIQUE="false" FIELDS="courseid"/>
+      </INDEXES>
+    </TABLE>
+    
+    <!-- User Performance Cache - Optimized -->
+    <TABLE NAME="local_aa_user_perf" COMMENT="Cached user performance metrics - updated daily">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0"/>
+        <FIELD NAME="courseid" TYPE="int" LENGTH="10" NOTNULL="false" DEFAULT="0"/>
+        <FIELD NAME="engagement_score" TYPE="number" LENGTH="5" NOTNULL="true" DEFAULT="0" DECIMALS="2"/>
+        <FIELD NAME="completion_percentage" TYPE="number" LENGTH="5" NOTNULL="true" DEFAULT="0" DECIMALS="2"/>
+        <FIELD NAME="avg_quiz_score" TYPE="number" LENGTH="5" NOTNULL="true" DEFAULT="0" DECIMALS="2"/>
+        <FIELD NAME="time_spent" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" COMMENT="Total time spent in seconds"/>
+        <FIELD NAME="last_access" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0"/>
+        <FIELD NAME="login_count" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" COMMENT="Total logins last 30 days"/>
+        <FIELD NAME="risk_level" TYPE="char" LENGTH="20" NOTNULL="false" COMMENT="low, medium, high"/>
+        <FIELD NAME="predicted_completion" TYPE="number" LENGTH="5" NOTNULL="true" DEFAULT="0" DECIMALS="2" COMMENT="Predicted completion percentage"/>
+        <FIELD NAME="last_calculated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="user_course" TYPE="unique" FIELDS="userid, courseid"/>
+        <KEY NAME="userid" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="risk_idx" UNIQUE="false" FIELDS="risk_level"/>
+        <INDEX NAME="user_idx" UNIQUE="false" FIELDS="userid"/>
+        <INDEX NAME="engagement_idx" UNIQUE="false" FIELDS="engagement_score"/>
+      </INDEXES>
+    </TABLE>
+    
+    <!-- Department Stats Table - Optimized -->
+    <TABLE NAME="local_aa_dept_stats" COMMENT="Department-level statistics - daily snapshots">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="department" TYPE="char" LENGTH="100" NOTNULL="true"/>
+        <FIELD NAME="date" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0"/>
+        <FIELD NAME="total_employees" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0"/>
+        <FIELD NAME="trained_employees" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0"/>
+        <FIELD NAME="compliance_rate" TYPE="number" LENGTH="5" NOTNULL="true" DEFAULT="0" DECIMALS="2"/>
+        <FIELD NAME="avg_performance" TYPE="number" LENGTH="5" NOTNULL="true" DEFAULT="0" DECIMALS="2"/>
+        <FIELD NAME="certifications_earned" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0"/>
+        <FIELD NAME="certifications_expiring" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0"/>
+        <FIELD NAME="at_risk_count" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0"/>
+        <FIELD NAME="high_performers" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" COMMENT="Users with >80% engagement"/>
+        <FIELD NAME="low_performers" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" COMMENT="Users with <30% engagement"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="dept_date" TYPE="unique" FIELDS="department, date"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="date_idx" UNIQUE="false" FIELDS="date"/>
+        <INDEX NAME="dept_idx" UNIQUE="false" FIELDS="department"/>
+        <INDEX NAME="compliance_idx" UNIQUE="false" FIELDS="compliance_rate"/>
+      </INDEXES>
+    </TABLE>
+    
+    <!-- Course Analytics Cache - New Table -->
+    <TABLE NAME="local_aa_course_cache" COMMENT="Course-level analytics cache">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="courseid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0"/>
+        <FIELD NAME="date" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0"/>
+        <FIELD NAME="total_enrolled" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0"/>
+        <FIELD NAME="completed_count" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0"/>
+        <FIELD NAME="completion_rate" TYPE="number" LENGTH="5" NOTNULL="true" DEFAULT="0" DECIMALS="2"/>
+        <FIELD NAME="avg_grade" TYPE="number" LENGTH="5" NOTNULL="true" DEFAULT="0" DECIMALS="2"/>
+        <FIELD NAME="active_participants" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0"/>
+        <FIELD NAME="avg_time_spent" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" COMMENT="Average time in seconds"/>
+        <FIELD NAME="last_activity" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="course_date" TYPE="unique" FIELDS="courseid, date"/>
+        <KEY NAME="courseid" TYPE="foreign" FIELDS="courseid" REFTABLE="course" REFFIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="completion_idx" UNIQUE="false" FIELDS="completion_rate"/>
+        <INDEX NAME="date_idx" UNIQUE="false" FIELDS="date"/>
+      </INDEXES>
+    </TABLE>
+    <!-- Compliance Tracking Table -->
+<TABLE NAME="local_aa_compliance" COMMENT="Compliance tracking for mandatory courses">
+  <FIELDS>
+    <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+    <FIELD NAME="courseid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0"/>
+    <FIELD NAME="is_mandatory" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0"/>
+    <FIELD NAME="expiry_days" TYPE="int" LENGTH="10" NOTNULL="false" COMMENT="Days after completion when certificate expires"/>
+    <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0"/>
+    <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0"/>
+  </FIELDS>
+  <KEYS>
+    <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+    <KEY NAME="courseid" TYPE="unique" FIELDS="courseid"/>
+  </KEYS>
+</TABLE>
+
+<!-- User Compliance Cache -->
+<TABLE NAME="local_aa_user_compliance" COMMENT="Cached user compliance data">
+  <FIELDS>
+    <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+    <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0"/>
+    <FIELD NAME="compliance_percentage" TYPE="number" LENGTH="5" NOTNULL="true" DEFAULT="0" DECIMALS="2"/>
+    <FIELD NAME="completed_count" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0"/>
+    <FIELD NAME="total_mandatory" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0"/>
+    <FIELD NAME="expired_count" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0"/>
+    <FIELD NAME="status" TYPE="char" LENGTH="20" NOTNULL="true" DEFAULT="pending"/>
+    <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0"/>
+    <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0"/>
+  </FIELDS>
+  <KEYS>
+    <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+    <KEY NAME="userid" TYPE="unique" FIELDS="userid"/>
+    <KEY NAME="userid" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id"/>
+  </KEYS>
+  <INDEXES>
+    <INDEX NAME="status_idx" UNIQUE="false" FIELDS="status"/>
+  </INDEXES>
+</TABLE>
+    <!-- Scheduled Reports Table -->
+    <TABLE NAME="local_aa_reports" COMMENT="Scheduled report definitions">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" COMMENT="User who created the schedule"/>
+        <FIELD NAME="name" TYPE="char" LENGTH="100" NOTNULL="true"/>
+        <FIELD NAME="report_type" TYPE="char" LENGTH="20" NOTNULL="true" DEFAULT="executive" COMMENT="executive, department, compliance"/>
+        <FIELD NAME="frequency" TYPE="char" LENGTH="10" NOTNULL="true" DEFAULT="weekly" COMMENT="daily, weekly, monthly"/>
+        <FIELD NAME="format" TYPE="char" LENGTH="10" NOTNULL="true" DEFAULT="pdf" COMMENT="pdf, excel, csv"/>
+        <FIELD NAME="recipients" TYPE="text" NOTNULL="true" COMMENT="Comma separated emails"/>
+        <FIELD NAME="last_sent" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0"/>
+        <FIELD NAME="status" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="1"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+    </TABLE>
+  </TABLES>
+</XMLDB>
